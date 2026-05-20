@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>潮墨智能体</title>
+    <script src="marked.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -213,6 +214,59 @@
 
         .message.agent .message-content {
             margin-left: 15px;
+        }
+
+        /* Markdown 样式 */
+        .message-content pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .message-content code {
+            background: #e8e4dd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .message-content pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        .message-content p {
+            margin: 8px 0;
+        }
+
+        .message-content ul, .message-content ol {
+            margin: 8px 0;
+            padding-left: 25px;
+        }
+
+        .message-content blockquote {
+            border-left: 4px solid #ccc;
+            padding-left: 15px;
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .message-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .message-content h1, .message-content h2, .message-content h3,
+        .message-content h4, .message-content h5, .message-content h6 {
+            margin: 15px 0 10px 0;
+        }
+
+        .message-content a {
+            color: #0066cc;
         }
 
         .chat-input-container {
@@ -456,9 +510,8 @@
     <!-- 文生文页面 -->
     <div id="page-wen-sheng-wen" class="page">
         <div class="page-header">
-            <div class="header-placeholder"></div>
-            <h2 class="page-title">水墨知识站 · 墨老问答</h2>
             <div class="back-btn" onclick="showPage('page-home')">←</div>
+            <h2 class="page-title">水墨知识站 · 墨老问答</h2>
         </div>
         <div class="chat-container">
             <div class="chat-messages" id="chat-messages">
@@ -479,9 +532,8 @@
     <!-- 图生文页面 -->
     <div id="page-tu-sheng-wen" class="page">
         <div class="page-header">
-            <div class="header-placeholder"></div>
-            <h2 class="page-title">作品交流馆 · 作品点评</h2>
             <div class="back-btn" onclick="showPage('page-home')">←</div>
+            <h2 class="page-title">作品交流馆 · 作品点评</h2>
         </div>
         <div class="upload-container">
             <div class="upload-area" id="tu-sheng-wen-upload-area" onclick="document.getElementById('tu-sheng-wen-input').click()">
@@ -508,9 +560,8 @@
     <!-- 图生图页面 -->
     <div id="page-tu-sheng-tu" class="page">
         <div class="page-header">
-            <div class="header-placeholder"></div>
-            <h2 class="page-title">文创实训坊 · 创意衍生</h2>
             <div class="back-btn" onclick="showPage('page-home')">←</div>
+            <h2 class="page-title">文创实训坊 · 创意衍生</h2>
         </div>
         <div class="upload-container">
             <div class="upload-area" id="tu-sheng-tu-upload-area" onclick="document.getElementById('tu-sheng-tu-input').click()">
@@ -539,7 +590,7 @@
         const API_BASE = 'http://localhost/v1';
         const API_KEYS = {
             'wen-sheng-wen': 'app-D1knP5piW5W6qyr5VEILwGOF',
-            'tu-sheng-wen': 'app-ZQww2qoKPvMM3SLXtnuY4Lji',
+            'tu-sheng-wen': 'app-CIT2gCFfV1Hn33ccO1aOZVwO',
             'tu-sheng-tu': 'app-At01SvHeBqSOLVoN9X8gsvhK'
         };
 
@@ -572,9 +623,25 @@
             addChatMessage('user', message);
             input.value = '';
 
+            // 创建墨老的临时消息容器，用于流式更新
+            const container = document.getElementById('chat-messages');
+            const agentDiv = document.createElement('div');
+            agentDiv.className = 'message agent';
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            avatarDiv.innerHTML = '<img src="墨老.png" alt="墨老">';
+
+            const messageContentDiv = document.createElement('div');
+            messageContentDiv.className = 'message-content';
+
+            agentDiv.appendChild(avatarDiv);
+            agentDiv.appendChild(messageContentDiv);
+            container.appendChild(agentDiv);
+            container.scrollTop = container.scrollHeight;
+
             // 发送请求
             try {
-                console.log('Sending request to Dify...');
                 const response = await fetch(`${API_BASE}/chat-messages`, {
                     method: 'POST',
                     headers: {
@@ -590,36 +657,39 @@
                     })
                 });
 
-                console.log('Response status:', response.status);
-                console.log('Content-Type:', response.headers.get('content-type'));
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullReply = '';
 
-                // 读取原始文本
-                const responseText = await response.text();
-                console.log('Raw response:', responseText.substring(0, 500));
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
 
-                // 解析 SSE 格式
-                const lines = responseText.split('\n');
-                let reply = '';
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        try {
-                            const data = JSON.parse(line.substring(6));
-                            if (data.answer) {
-                                reply += data.answer;
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                if (data.answer) {
+                                    fullReply += data.answer;
+                                    // 流式更新内容
+                                    messageContentDiv.innerHTML = marked.parse(fullReply);
+                                    container.scrollTop = container.scrollHeight;
+                                }
+                            } catch (e) {
+                                // 忽略解析错误
                             }
-                        } catch (e) {
-                            // 忽略解析错误
                         }
                     }
                 }
 
-                if (!reply) {
-                    reply = '抱歉，我现在无法回答这个问题。';
+                if (!fullReply) {
+                    messageContentDiv.innerHTML = '抱歉，我现在无法回答这个问题。';
                 }
-                addChatMessage('agent', reply);
             } catch (error) {
                 console.error('Fetch error:', error);
-                addChatMessage('agent', '网络连接失败，请检查Dify服务是否正常运行。');
+                messageContentDiv.innerHTML = '网络连接失败，请检查Dify服务是否正常运行。';
             }
 
             btn.disabled = false;
@@ -630,9 +700,13 @@
             const avatar = role === 'agent' ? '<img src="墨老.png" alt="墨老">' : '';
             const div = document.createElement('div');
             div.className = `message ${role}`;
+
+            // 墨老的回复需要渲染 Markdown，用户消息直接显示
+            const messageContent = role === 'agent' ? marked.parse(content) : escapeHtml(content);
+
             div.innerHTML = `
-                <div class="message-avatar">${avatar}</div>
-                <div class="message-content">${escapeHtml(content)}</div>
+                ${role === 'agent' ? `<div class="message-avatar">${avatar}</div>` : ''}
+                <div class="message-content">${messageContent}</div>
             `;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
@@ -686,16 +760,50 @@
                     body: JSON.stringify({
                         "inputs": {},
                         "query": "请评价这幅水墨画作品",
-                        "response_mode": "blocking",
+                        "response_mode": "streaming",
                         "user": "student",
                         "files": [{"type": "image", "transfer_method": "base64", "url": imageUrl}]
                     })
                 });
 
-                const data = await response.json();
-                const reply = data.answer || '抱歉，无法获取评价。';
+                // agent-chat 只支持 streaming，需要解析 SSE 流
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                const resultText = document.getElementById('tu-sheng-wen-text');
+                let reply = '';
 
-                document.getElementById('tu-sheng-wen-text').textContent = reply;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                if (data.event === 'message' && data.answer) {
+                                    reply += data.answer;
+                                    resultText.textContent = reply;
+                                    result.classList.add('visible');
+                                }
+                                if (data.event === 'message_end') {
+                                    break;
+                                }
+                                if (data.event === 'error') {
+                                    throw new Error(data.message || '请求失败');
+                                }
+                            } catch (e) {
+                                // 忽略解析错误
+                            }
+                        }
+                    }
+                }
+
+                if (!reply) {
+                    reply = '抱歉，无法获取评价。';
+                }
+                resultText.textContent = reply;
                 result.classList.add('visible');
             } catch (error) {
                 alert('提交失败：' + error.message);
@@ -742,6 +850,7 @@
             try {
                 const base64 = await fileToBase64(tuShengTuFile);
                 const imageUrl = `data:${tuShengTuFile.type};base64,${base64}`;
+                const resultImage = document.getElementById('tu-sheng-tu-image');
 
                 const response = await fetch(`${API_BASE}/chat-messages`, {
                     method: 'POST',
@@ -752,30 +861,69 @@
                     body: JSON.stringify({
                         "inputs": {},
                         "query": "请根据这幅作品生成一个水墨风格的创意衍生图",
-                        "response_mode": "blocking",
+                        "response_mode": "streaming",
                         "user": "student",
                         "files": [{"type": "image", "transfer_method": "base64", "url": imageUrl}]
                     })
                 });
 
-                const data = await response.json();
+                // 使用 streaming 模式解析 SSE
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullResponse = '';
 
-                // 尝试从响应中提取图片
-                // 注意：Dify 返回的图片可能在 data.images 中或需要从 answer 中解析
-                if (data.data && data.data.images && data.data.images.length > 0) {
-                    document.getElementById('tu-sheng-tu-image').src = data.data.images[0];
-                    result.classList.add('visible');
-                } else if (data.answer) {
-                    // 尝试从文本中提取图片URL
-                    const imageMatch = data.answer.match(/!\[.*?\]\((.*?)\)/);
-                    if (imageMatch) {
-                        document.getElementById('tu-sheng-tu-image').src = imageMatch[1];
-                        result.classList.add('visible');
-                    } else {
-                        alert('未能在响应中找到生成的图片');
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    fullResponse += chunk;
+                }
+
+                // 解析 SSE 提取图片链接
+                const lines = fullResponse.split('\n');
+                let imageUrlFound = '';
+                let textReply = '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.substring(6));
+                            if (data.event === 'message' && data.answer) {
+                                textReply += data.answer;
+                                // 从 answer 中提取 markdown 图片
+                                const imageMatch = data.answer.match(/!\[.*?\]\((.*?)\)/);
+                                if (imageMatch && imageMatch[1]) {
+                                    imageUrlFound = imageMatch[1];
+                                }
+                            }
+                            if (data.event === 'message_end') {
+                                break;
+                            }
+                            if (data.event === 'error') {
+                                throw new Error(data.message || '请求失败');
+                            }
+                        } catch (e) {
+                            if (e.message !== 'JSON parse error') {
+                                throw e;
+                            }
+                        }
                     }
+                }
+
+                // 如果流式响应中没找到，再从完整响应中尝试提取
+                if (!imageUrlFound) {
+                    const imageMatch = textReply.match(/!\[.*?\]\((.*?)\)/);
+                    if (imageMatch && imageMatch[1]) {
+                        imageUrlFound = imageMatch[1];
+                    }
+                }
+
+                if (imageUrlFound) {
+                    resultImage.src = imageUrlFound;
+                    result.classList.add('visible');
                 } else {
-                    alert('未能获取生成的图片');
+                    alert('未能在响应中找到生成的图片');
                 }
             } catch (error) {
                 alert('提交失败：' + error.message);
