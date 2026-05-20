@@ -1,0 +1,530 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 图生图
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.42@db089179610a44ce4ba3cf123e61cb75fe20441a609ec1b0364b43447ced7210
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: sawyer-shi/seedream_aigc:0.0.2@5d7eceb101e80337ac5885d1c6214bad7cb9989edbfc7174f97abedd2489f465
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - remote_url
+      - local_file
+      enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1779195404941-source-llm-target
+      source: '1779195404941'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: tool
+      id: llm-source-1779195677400-target
+      source: llm
+      sourceHandle: source
+      target: '1779195677400'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: answer
+      id: 1779195677400-source-answer-target
+      source: '1779195677400'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables: []
+      height: 90
+      id: '1779195404941'
+      position:
+        x: 80
+        y: 282
+      positionAbsolute:
+        x: 80
+        y: 282
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen3.6-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 4a4e260d-c480-46e8-807a-e066896ceb0d
+          role: system
+          text: '# 身份
+
+            你是新潮时尚的水墨文创设计师，审美年轻化、语言精炼。
+
+
+            # 核心规则（必须严格按顺序执行）
+
+
+            ## 阶段1：看图判断类别
+
+            拿到图片后立即判断是哪一类：
+
+            - A类：铅笔画/线稿/草图
+
+            - B类：已完成的国画/水墨原作
+
+            - C类：现成文创产品图
+
+
+            ## 阶段2：根据类别生成图片（直接调用 imagefile2image）
+
+
+            ### A类 → 生成完整国风水墨作品
+
+            - prompt：纯水墨国画风格，笔触遒劲，墨色浓淡层次分明，宣纸质感，传统构图，留白意境，气韵生动
+
+            - input_image_file：用户上传的图片
+
+
+            ### B类 → 生成水墨文创周边效果图
+
+            - prompt：水墨风格文创产品效果图（可选：书签/帆布包/手机壳/丝巾/茶具），保留水墨元素，时尚年轻化设计，商业产品展示
+
+            - input_image_file：用户上传的图片
+
+
+            ### C类 → 优化/改版文创设计
+
+            - prompt：升级版文创设计效果图，更年轻化审美，保留核心水墨元素，商业产品展示，高级感
+
+            - input_image_file：用户上传的图片
+
+
+            ## 阶段3：文字点评（图片生成完成后）
+
+            输出必须简短，三句话：
+
+            1. 简短评价（5字内）
+
+            2. 设计理念（10字内）
+
+            3. 一句启发引导（15字内）
+
+
+            # 禁止
+
+            - 不要在文字中伪造图片链接
+
+            - 不要输出代码块
+
+            - 不要长篇大论
+
+            '
+        selected: false
+        structured_output_enabled: false
+        title: LLM
+        type: llm
+        vision:
+          configs:
+            detail: high
+            variable_selector:
+            - sys
+            - files
+          enabled: true
+      height: 108
+      id: llm
+      position:
+        x: 385.686252634615
+        y: 288.72717136835166
+      positionAbsolute:
+        x: 385.686252634615
+        y: 288.72717136835166
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#llm.text#}}
+
+          {{#1779195677400.files#}}'
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 142
+      id: answer
+      position:
+        x: 980
+        y: 282
+      positionAbsolute:
+        x: 980
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Text description of the image you want to generate
+            ja_JP: Text description of the image you want to generate
+            pt_BR: Text description of the image you want to generate
+            zh_Hans: 您想要生成的图像的文本描述
+          label:
+            en_US: Prompt
+            ja_JP: Prompt
+            pt_BR: Prompt
+            zh_Hans: 提示词
+          llm_description: Text description of the image to generate
+          max: null
+          min: null
+          name: prompt
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Reference image file for generation (jpeg, png, webp, bmp, tiff,
+              gif; <=10MB)
+            ja_JP: Reference image file for generation (jpeg, png, webp, bmp, tiff,
+              gif; <=10MB)
+            pt_BR: Reference image file for generation (jpeg, png, webp, bmp, tiff,
+              gif; <=10MB)
+            zh_Hans: 用于生成的参考图片文件（jpeg、png、webp、bmp、tiff、gif；<=10MB）
+          label:
+            en_US: Reference Image File
+            ja_JP: Reference Image File
+            pt_BR: Reference Image File
+            zh_Hans: 参考图片文件
+          llm_description: Reference image file to use for generation
+          max: null
+          min: null
+          name: input_image_file
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: file
+        - auto_generate: null
+          default: 2048x2048
+          form: form
+          human_description:
+            en_US: Size of the generated image
+            ja_JP: Size of the generated image
+            pt_BR: Size of the generated image
+            zh_Hans: 生成图像的尺寸
+          label:
+            en_US: Image Size
+            ja_JP: Image Size
+            pt_BR: Image Size
+            zh_Hans: 图像尺寸
+          llm_description: Size of the generated image
+          max: null
+          min: null
+          name: size
+          options:
+          - icon: ''
+            label:
+              en_US: 1:1 (2048x2048)
+              ja_JP: 1:1 (2048x2048)
+              pt_BR: 1:1 (2048x2048)
+              zh_Hans: 1:1 (2048x2048)
+            value: 2048x2048
+          - icon: ''
+            label:
+              en_US: 4:3 (2304x1728)
+              ja_JP: 4:3 (2304x1728)
+              pt_BR: 4:3 (2304x1728)
+              zh_Hans: 4:3 (2304x1728)
+            value: 2304x1728
+          - icon: ''
+            label:
+              en_US: 3:4 (1728x2304)
+              ja_JP: 3:4 (1728x2304)
+              pt_BR: 3:4 (1728x2304)
+              zh_Hans: 3:4 (1728x2304)
+            value: 1728x2304
+          - icon: ''
+            label:
+              en_US: 16:9 (2560x1440)
+              ja_JP: 16:9 (2560x1440)
+              pt_BR: 16:9 (2560x1440)
+              zh_Hans: 16:9 (2560x1440)
+            value: 2560x1440
+          - icon: ''
+            label:
+              en_US: 9:16 (1440x2560)
+              ja_JP: 9:16 (1440x2560)
+              pt_BR: 9:16 (1440x2560)
+              zh_Hans: 9:16 (1440x2560)
+            value: 1440x2560
+          - icon: ''
+            label:
+              en_US: 3:2 (2496x1664)
+              ja_JP: 3:2 (2496x1664)
+              pt_BR: 3:2 (2496x1664)
+              zh_Hans: 3:2 (2496x1664)
+            value: 2496x1664
+          - icon: ''
+            label:
+              en_US: 2:3 (1664x2496)
+              ja_JP: 2:3 (1664x2496)
+              pt_BR: 2:3 (1664x2496)
+              zh_Hans: 2:3 (1664x2496)
+            value: 1664x2496
+          - icon: ''
+            label:
+              en_US: 21:9 (3024x1296)
+              ja_JP: 21:9 (3024x1296)
+              pt_BR: 21:9 (3024x1296)
+              zh_Hans: 21:9 (3024x1296)
+            value: 3024x1296
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        - auto_generate: null
+          default: 'true'
+          form: form
+          human_description:
+            en_US: Whether to add 'AI Generated' watermark to the image
+            ja_JP: Whether to add 'AI Generated' watermark to the image
+            pt_BR: Whether to add 'AI Generated' watermark to the image
+            zh_Hans: 是否在图像上添加'AI生成'水印
+          label:
+            en_US: Watermark
+            ja_JP: Watermark
+            pt_BR: Watermark
+            zh_Hans: 水印
+          llm_description: Whether to add 'AI Generated' watermark to the image
+          max: null
+          min: null
+          name: watermark
+          options:
+          - icon: ''
+            label:
+              en_US: Enabled
+              ja_JP: Enabled
+              pt_BR: Enabled
+              zh_Hans: 启用
+            value: 'true'
+          - icon: ''
+            label:
+              en_US: Disabled
+              ja_JP: Disabled
+              pt_BR: Disabled
+              zh_Hans: 禁用
+            value: 'false'
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        - auto_generate: null
+          default: doubao-seedream-4-5-251128
+          form: form
+          human_description:
+            en_US: Choose the Seedream model version to use
+            ja_JP: Choose the Seedream model version to use
+            pt_BR: Choose the Seedream model version to use
+            zh_Hans: 选择要使用的Seedream模型版本
+          label:
+            en_US: Model Version
+            ja_JP: Model Version
+            pt_BR: Model Version
+            zh_Hans: 模型版本
+          llm_description: Choose the Seedream model version to use
+          max: null
+          min: null
+          name: model
+          options:
+          - icon: ''
+            label:
+              en_US: Seedream4.0
+              ja_JP: Seedream4.0
+              pt_BR: Seedream4.0
+              zh_Hans: Seedream4.0
+            value: doubao-seedream-4-0-250828
+          - icon: ''
+            label:
+              en_US: Seedream4.5
+              ja_JP: Seedream4.5
+              pt_BR: Seedream4.5
+              zh_Hans: Seedream4.5
+            value: doubao-seedream-4-5-251128
+          - icon: ''
+            label:
+              en_US: Seedream5.0 Lite
+              ja_JP: Seedream5.0 Lite
+              pt_BR: Seedream5.0 Lite
+              zh_Hans: Seedream5.0 Lite
+            value: doubao-seedream-5-0-260128
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        params:
+          input_image_file: ''
+          model: ''
+          prompt: ''
+          size: ''
+          watermark: ''
+        plugin_id: sawyer-shi/seedream_aigc
+        plugin_unique_identifier: sawyer-shi/seedream_aigc:0.0.2@5d7eceb101e80337ac5885d1c6214bad7cb9989edbfc7174f97abedd2489f465
+        provider_icon: /console/api/workspaces/current/plugin/icon?tenant_id=66e02019-a182-4207-bcea-9e59e1018aba&filename=9638639a259e524d8a12d8fa29d692c7b226cc88124ff4fb1eb2d31d0c9f88d3.svg
+        provider_id: sawyer-shi/seedream_aigc/seedream_aigc
+        provider_name: sawyer-shi/seedream_aigc/seedream_aigc
+        provider_type: builtin
+        selected: false
+        title: Seedream-图生图
+        tool_configurations:
+          model:
+            type: constant
+            value: doubao-seedream-4-5-251128
+          size:
+            type: constant
+            value: 2048x2048
+          watermark:
+            type: constant
+            value: 'true'
+        tool_description: 使用Seedream模型根据文本描述和参考图像生成图像
+        tool_label: Seedream-图生图
+        tool_name: imagefile2image
+        tool_node_version: '2'
+        tool_parameters:
+          input_image_file:
+            type: variable
+            value:
+            - sys
+            - files
+          prompt:
+            type: mixed
+            value: '{{#llm.text#}}'
+        type: tool
+      height: 173
+      id: '1779195677400'
+      position:
+        x: 662.1411528453841
+        y: 308.9792618960987
+      positionAbsolute:
+        x: 662.1411528453841
+        y: 308.9792618960987
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -477.31702460230326
+      y: 46.709891294629415
+      zoom: 1.189207106814081
+  rag_pipeline_variables: []

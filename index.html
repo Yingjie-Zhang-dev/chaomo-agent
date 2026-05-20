@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>潮墨智能体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimSun', serif;
+            background-color: #f5f1eb;
+            color: #2c2c2c;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 背景 */
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #e8e4dd 0%, #f5f1eb 50%, #e8e4dd 100%);
+        }
+
+        .bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.15;
+        }
+
+        /* 页面容器 */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 首页 */
+        .home-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .home-title {
+            font-size: 3.5rem;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            letter-spacing: 0.3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .home-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 60px;
+            letter-spacing: 0.2em;
+        }
+
+        .home-buttons {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .home-btn {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #333;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .home-btn:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.95);
+        }
+
+        .home-btn-icon {
+            font-size: 3rem;
+        }
+
+        .home-btn-text {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .home-btn-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* 通用页面头部 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(255,255,255,0.9);
+            border-bottom: 2px solid #333;
+        }
+
+        .back-btn {
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: transform 0.2s;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .page-title {
+            flex: 1;
+            text-align: center;
+            font-size: 1.8rem;
+            letter-spacing: 0.2em;
+        }
+
+        .header-placeholder {
+            width: 80px;
+        }
+
+        /* 文生文页面 */
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid #333;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 15px;
+            background: #f0ebe3;
+            border: 1px solid #ccc;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: #e8e4dd;
+            margin-right: 15px;
+        }
+
+        .message.agent .message-content {
+            margin-left: 15px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #333;
+            border-radius: 30px;
+            background: #fff;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #666;
+        }
+
+        .chat-send-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .chat-send-btn:hover {
+            background: #555;
+        }
+
+        .chat-send-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        /* 图生文/图生图页面 */
+        .upload-container {
+            max-width: 800px;
+            margin: 30px auto;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #333;
+            border-radius: 20px;
+            padding: 60px 40px;
+            background: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            background: rgba(255,255,255,0.95);
+            border-color: #555;
+        }
+
+        .upload-area.dragover {
+            background: rgba(255,255,255,0.95);
+            border-color: #333;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .upload-preview {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 20px auto;
+            display: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .upload-preview.visible {
+            display: block;
+        }
+
+        .action-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+
+        .action-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+
+        .action-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-btn.secondary {
+            background: transparent;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .action-btn.secondary:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .result-area {
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+            display: none;
+        }
+
+        .result-area.visible {
+            display: block;
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+
+        .result-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e8e4dd;
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e8e4dd;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #999;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景 -->
+    <div class="bg-container">
+        <img src="73ff54346a98547b3a639c244f1561c8.png" alt="背景" class="bg-image">
+    </div>
+
+    <!-- 首页 -->
+    <div id="page-home" class="page active">
+        <div class="home-container">
+            <h1 class="home-title">潮墨智能体</h1>
+            <p class="home-subtitle">水墨艺术 · 创意无限</p>
+            <div class="home-buttons">
+                <button class="home-btn" onclick="showPage('page-wen-sheng-wen')">
+                    <span class="home-btn-icon">📜</span>
+                    <span class="home-btn-text">水墨知识站</span>
+                    <span class="home-btn-desc">水墨知识问答</span>
+                </button>
+                <button class="home-btn" onclick="showPage('page-tu-sheng-tu')">
+                    <span class="home-btn-icon">✨</span>
+                    <span class="home-btn-text">文创实训坊</span>
+                    <span class="home-btn-desc">创作衍生作品</span>
+                </button>
+                <button class="home-btn" onclick="showPage('page-tu-sheng-wen')">
+                    <span class="home-btn-icon">🖼️</span>
+                    <span class="home-btn-text">作品交流馆</span>
+                    <span class="home-btn-desc">作品评价建议</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文生文页面 -->
+    <div id="page-wen-sheng-wen" class="page">
+        <div class="page-header">
+            <div class="header-placeholder"></div>
+            <h2 class="page-title">水墨知识站 · 墨老问答</h2>
+            <div class="back-btn" onclick="showPage('page-home')">←</div>
+        </div>
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message agent">
+                    <div class="message-avatar">
+                        <img src="墨老.png" alt="墨老">
+                    </div>
+                    <div class="message-content">你好，我是墨老，有什么关于水墨领域的问题，都可以问我！</div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chat-input" placeholder="输入您的问题..." onkeypress="handleChatKeypress(event)">
+                <button class="chat-send-btn" id="chat-send-btn" onclick="sendChatMessage()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图生文页面 -->
+    <div id="page-tu-sheng-wen" class="page">
+        <div class="page-header">
+            <div class="header-placeholder"></div>
+            <h2 class="page-title">作品交流馆 · 作品点评</h2>
+            <div class="back-btn" onclick="showPage('page-home')">←</div>
+        </div>
+        <div class="upload-container">
+            <div class="upload-area" id="tu-sheng-wen-upload-area" onclick="document.getElementById('tu-sheng-wen-input').click()">
+                <div class="upload-icon">🎨</div>
+                <div class="upload-text">点击或拖拽上传水墨作品</div>
+                <div class="upload-hint">支持 JPG、PNG、GIF、WebP 格式</div>
+            </div>
+            <input type="file" id="tu-sheng-wen-input" accept="image/*" style="display:none" onchange="handleTuShengWenFile(this)">
+            <img id="tu-sheng-wen-preview" class="upload-preview" alt="预览">
+            <div>
+                <button class="action-btn" id="tu-sheng-wen-submit" onclick="submitTuShengWen()" disabled>提交评价</button>
+                <button class="action-btn secondary" onclick="resetTuShengWen()">重新上传</button>
+            </div>
+            <div class="loading" id="tu-sheng-wen-loading">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">墨老正在点评您的作品...</div>
+            </div>
+            <div class="result-area" id="tu-sheng-wen-result">
+                <div class="result-text" id="tu-sheng-wen-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图生图页面 -->
+    <div id="page-tu-sheng-tu" class="page">
+        <div class="page-header">
+            <div class="header-placeholder"></div>
+            <h2 class="page-title">文创实训坊 · 创意衍生</h2>
+            <div class="back-btn" onclick="showPage('page-home')">←</div>
+        </div>
+        <div class="upload-container">
+            <div class="upload-area" id="tu-sheng-tu-upload-area" onclick="document.getElementById('tu-sheng-tu-input').click()">
+                <div class="upload-icon">✨</div>
+                <div class="upload-text">点击或拖拽上传草图或作品</div>
+                <div class="upload-hint">支持 JPG、PNG、GIF、WebP 格式</div>
+            </div>
+            <input type="file" id="tu-sheng-tu-input" accept="image/*" style="display:none" onchange="handleTuShengTuFile(this)">
+            <img id="tu-sheng-tu-preview" class="upload-preview" alt="预览">
+            <div>
+                <button class="action-btn" id="tu-sheng-tu-submit" onclick="submitTuShengTu()" disabled>生成作品</button>
+                <button class="action-btn secondary" onclick="resetTuShengTu()">重新上传</button>
+            </div>
+            <div class="loading" id="tu-sheng-tu-loading">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">正在生成创意作品...</div>
+            </div>
+            <div class="result-area" id="tu-sheng-tu-result">
+                <img id="tu-sheng-tu-image" class="result-image" alt="生成结果">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API 配置
+        const API_BASE = 'http://localhost/v1';
+        const APP_IDS = {
+            'wen-sheng-wen': 'D1knP5piW5W6qyr5VEILwGOF',
+            'tu-sheng-wen': 'ZQww2qoKPvMM3SLXtnuY4Lji',
+            'tu-sheng-tu': 'At01SvHeBqSOLVoN9X8gsvhK'
+        };
+
+        // 页面切换
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // ============ 文生文 ============
+        let chatFile = null;
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const btn = document.getElementById('chat-send-btn');
+            btn.disabled = true;
+
+            // 添加用户消息
+            addChatMessage('user', message);
+            input.value = '';
+
+            // 发送请求
+            try {
+                const response = await fetch(`${API_BASE}/chat-messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "inputs": {},
+                        "query": message,
+                        "response_mode": "blocking",
+                        "user": "student",
+                        "conversation_id": ""
+                    })
+                });
+
+                const data = await response.json();
+                const reply = data.answer || '抱歉，我现在无法回答这个问题。';
+                addChatMessage('agent', reply);
+            } catch (error) {
+                addChatMessage('agent', '网络连接失败，请检查Dify服务是否正常运行。');
+            }
+
+            btn.disabled = false;
+        }
+
+        function addChatMessage(role, content) {
+            const container = document.getElementById('chat-messages');
+            const avatar = role === 'agent' ? '<img src="墨老.png" alt="墨老">' : '';
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">${escapeHtml(content)}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ============ 图生文 ============
+        let tuShengWenFile = null;
+
+        function handleTuShengWenFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            tuShengWenFile = file;
+            const preview = document.getElementById('tu-sheng-wen-preview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('visible');
+            document.getElementById('tu-sheng-wen-submit').disabled = false;
+        }
+
+        function resetTuShengWen() {
+            tuShengWenFile = null;
+            document.getElementById('tu-sheng-wen-input').value = '';
+            document.getElementById('tu-sheng-wen-preview').classList.remove('visible');
+            document.getElementById('tu-sheng-wen-preview').src = '';
+            document.getElementById('tu-sheng-wen-submit').disabled = true;
+            document.getElementById('tu-sheng-wen-result').classList.remove('visible');
+        }
+
+        async function submitTuShengWen() {
+            if (!tuShengWenFile) return;
+
+            const loading = document.getElementById('tu-sheng-wen-loading');
+            const result = document.getElementById('tu-sheng-wen-result');
+            const btn = document.getElementById('tu-sheng-wen-submit');
+
+            loading.classList.add('visible');
+            result.classList.remove('visible');
+            btn.disabled = true;
+
+            try {
+                // 图片转 base64
+                const base64 = await fileToBase64(tuShengWenFile);
+                const imageUrl = `data:${tuShengWenFile.type};base64,${base64}`;
+
+                const response = await fetch(`${API_BASE}/chat-messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "inputs": {},
+                        "query": "请评价这幅水墨画作品",
+                        "response_mode": "blocking",
+                        "user": "student",
+                        "files": [{"type": "image", "transfer_method": "base64", "url": imageUrl}]
+                    })
+                });
+
+                const data = await response.json();
+                const reply = data.answer || '抱歉，无法获取评价。';
+
+                document.getElementById('tu-sheng-wen-text').textContent = reply;
+                result.classList.add('visible');
+            } catch (error) {
+                alert('提交失败：' + error.message);
+            }
+
+            loading.classList.remove('visible');
+            btn.disabled = false;
+        }
+
+        // ============ 图生图 ============
+        let tuShengTuFile = null;
+
+        function handleTuShengTuFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            tuShengTuFile = file;
+            const preview = document.getElementById('tu-sheng-tu-preview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('visible');
+            document.getElementById('tu-sheng-tu-submit').disabled = false;
+        }
+
+        function resetTuShengTu() {
+            tuShengTuFile = null;
+            document.getElementById('tu-sheng-tu-input').value = '';
+            document.getElementById('tu-sheng-tu-preview').classList.remove('visible');
+            document.getElementById('tu-sheng-tu-preview').src = '';
+            document.getElementById('tu-sheng-tu-submit').disabled = true;
+            document.getElementById('tu-sheng-tu-result').classList.remove('visible');
+        }
+
+        async function submitTuShengTu() {
+            if (!tuShengTuFile) return;
+
+            const loading = document.getElementById('tu-sheng-tu-loading');
+            const result = document.getElementById('tu-sheng-tu-result');
+            const btn = document.getElementById('tu-sheng-tu-submit');
+
+            loading.classList.add('visible');
+            result.classList.remove('visible');
+            btn.disabled = true;
+
+            try {
+                const base64 = await fileToBase64(tuShengTuFile);
+                const imageUrl = `data:${tuShengTuFile.type};base64,${base64}`;
+
+                const response = await fetch(`${API_BASE}/chat-messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "inputs": {},
+                        "query": "请根据这幅作品生成一个水墨风格的创意衍生图",
+                        "response_mode": "blocking",
+                        "user": "student",
+                        "files": [{"type": "image", "transfer_method": "base64", "url": imageUrl}]
+                    })
+                });
+
+                const data = await response.json();
+
+                // 尝试从响应中提取图片
+                // 注意：Dify 返回的图片可能在 data.images 中或需要从 answer 中解析
+                if (data.data && data.data.images && data.data.images.length > 0) {
+                    document.getElementById('tu-sheng-tu-image').src = data.data.images[0];
+                    result.classList.add('visible');
+                } else if (data.answer) {
+                    // 尝试从文本中提取图片URL
+                    const imageMatch = data.answer.match(/!\[.*?\]\((.*?)\)/);
+                    if (imageMatch) {
+                        document.getElementById('tu-sheng-tu-image').src = imageMatch[1];
+                        result.classList.add('visible');
+                    } else {
+                        alert('未能在响应中找到生成的图片');
+                    }
+                } else {
+                    alert('未能获取生成的图片');
+                }
+            } catch (error) {
+                alert('提交失败：' + error.message);
+            }
+
+            loading.classList.remove('visible');
+            btn.disabled = false;
+        }
+
+        // ============ 工具函数 ============
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 拖拽上传
+        setupDragUpload('tu-sheng-wen-upload-area', 'tu-sheng-wen-input', () => {
+            const preview = document.getElementById('tu-sheng-wen-preview');
+            if (preview.src) {
+                document.getElementById('tu-sheng-wen-submit').disabled = false;
+            }
+        });
+
+        setupDragUpload('tu-sheng-tu-upload-area', 'tu-sheng-tu-input', () => {
+            const preview = document.getElementById('tu-sheng-tu-preview');
+            if (preview.src) {
+                document.getElementById('tu-sheng-tu-submit').disabled = false;
+            }
+        });
+
+        function setupDragUpload(areaId, inputId, callback) {
+            const area = document.getElementById(areaId);
+            const input = document.getElementById(inputId);
+
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('dragover');
+            });
+
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
+                    input.dispatchEvent(new Event('change'));
+                    if (callback) callback();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

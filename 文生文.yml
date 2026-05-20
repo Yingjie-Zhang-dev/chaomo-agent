@@ -1,0 +1,312 @@
+app:
+  description: 测试
+  icon: 9ec774b8-e5f0-4308-b659-36e4b52e6e83
+  icon_background: ''
+  icon_type: image
+  mode: advanced-chat
+  name: 墨老
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/minimax:0.0.17@71c4f6828644f499978d8978792c6288730bde7012354906b95008e5e0995113
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.42@db089179610a44ce4ba3cf123e61cb75fe20441a609ec1b0364b43447ced7210
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - remote_url
+      - local_file
+      enabled: true
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: 你好，我是墨老，有什么关于水墨领域的问题，都可以问我！
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: true
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: true
+    text_to_speech:
+      autoPlay: enabled
+      enabled: true
+      language: zh-Hans
+      voice: Cherry
+  graph:
+    edges:
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1778242106061-source-llm-target
+      source: '1778242106061'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: question-classifier
+      id: 1778242098784-source-1778244494478-target
+      source: '1778242098784'
+      sourceHandle: source
+      target: '1778244494478'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: knowledge-retrieval
+      id: 1778244494478-1-1778242106061-target
+      source: '1778244494478'
+      sourceHandle: '1'
+      target: '1778242106061'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: llm
+      id: 1778244494478-2-llm-target
+      source: '1778244494478'
+      sourceHandle: '2'
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables: []
+      height: 89
+      id: '1778242098784'
+      position:
+        x: 0
+        y: 75
+      positionAbsolute:
+        x: 0
+        y: 75
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1778242106061'
+          - result
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: minimax-m2.7-highspeed
+          provider: langgenius/minimax/minimax
+        prompt_template:
+        - id: 21d17b5c-8b4c-40cd-984c-567fd0046b96
+          role: system
+          text: '你是一位深耕中国水墨（中国画）领域数十年的资深教书先生，熟稔水墨艺术的千年脉络、笔墨技法、东方美学与文化内核，也深谙水墨文创的当代转化、产业逻辑与教学实践。你温文尔雅，循循善诱，既懂专业的门道，也擅长把晦涩的知识讲得鲜活易懂。
+
+
+            你的核心职责，是面向成年学生（用户），解答他们在水墨领域（含传统水墨艺术、水墨文创相关）的各类疑问：{{#sys.query#}}，传道授业解惑，带他们读懂水墨里的笔墨、历史与文化。
+
+
+            请严格遵循以下原则回应：
+
+            1.  **以专业依据为根本**：优先参考{{#context#}}中的水墨文创教学知识库内容，在此基础上结合你的通识知识补充拓展，绝不编造无依据的信息；若知识库内容可直接回应问题，需以此为核心基础展开回答。
+
+            2.  **循循善诱，讲透来龙去脉**：回答要逻辑清晰，先回应问题的核心，再层层拆解背景、发展脉络、背后的文化逻辑与美学思想，把知识点的来龙去脉讲清楚，而非只给一个干巴巴的答案。
+
+            3.  **善用故事与典故**：讲解时可自然穿插相关的名家轶事、历史故事、流派演变，让知识点更鲜活，帮学生理解水墨艺术的传承与发展，感受文化的温度。
+
+            4.  **专业严谨，温润易懂**：保持教书先生的平和恳切语气，避免生硬堆砌术语；遇到专业概念要通俗解释，兼顾专业性与可读性，适配成年学生的学习节奏与理解需求。'
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 107
+      id: llm
+      position:
+        x: 1064
+        y: 82
+      positionAbsolute:
+        x: 1064
+        y: 82
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        answer: '{{#llm.text#}}'
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 119
+      id: answer
+      position:
+        x: 1405
+        y: 76
+      positionAbsolute:
+        x: 1405
+        y: 76
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        dataset_ids:
+        - NeFv6jKPoLiiwladJwmt42HgWQJPHboEVmhdudFhOv8BWOGBjx6+FFvy9YHWw7cz
+        metadata_filtering_mode: disabled
+        metadata_model_config:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: minimax-m2.7-highspeed
+          provider: langgenius/minimax/minimax
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: qwen3-rerank
+            provider: langgenius/tongyi/tongyi
+          top_k: 4
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1778242098784'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: 知识检索
+        type: knowledge-retrieval
+      height: 103
+      id: '1778242106061'
+      position:
+        x: 703
+        y: 0
+      positionAbsolute:
+        x: 703
+        y: 0
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        classes:
+        - id: '1'
+          name: 与水墨（中国画）相关的问题
+        - id: '2'
+          name: 与水墨（中国画）无关的问题
+        instruction: ''
+        instructions: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          window:
+            enabled: true
+            size: 50
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen3.6-plus
+          provider: langgenius/tongyi/tongyi
+        query_variable_selector:
+        - '1778242098784'
+        - sys.query
+        selected: false
+        title: 问题分类器
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 201
+      id: '1778244494478'
+      position:
+        x: 345.77824826321853
+        y: 19
+      positionAbsolute:
+        x: 345.77824826321853
+        y: 19
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    viewport:
+      x: 131.34864823100196
+      y: 227.13171502936487
+      zoom: 0.794018759753072
+  rag_pipeline_variables: []

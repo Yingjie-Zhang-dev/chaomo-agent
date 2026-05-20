@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__MiniMax__understand_image",
+      "Bash(docker exec *)",
+      "Bash(docker restart *)",
+      "Bash(ls -la \"C:\\\\Users\\\\zhang\\\\Downloads\\\\dify-main\")",
+      "Read(//c/Users/zhang/Downloads/dify-main/**)",
+      "mcp__MiniMax__web_search",
+      "Bash(docker-compose down *)",
+      "Bash(docker-compose up *)",
+      "Bash(docker-compose restart *)",
+      "Read(//c/Users/zhang/Desktop/**)",
+      "Bash(fe223\")"
+    ]
+  }
+}
