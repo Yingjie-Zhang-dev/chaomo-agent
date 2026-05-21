@@ -269,6 +269,177 @@
             color: #0066cc;
         }
 
+        /* 图生图页面布局 */
+        .tu-sheng-tu-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .tu-sheng-tu-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tu-sheng-tu-upload-area {
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1;
+            border: 3px dashed #333;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tu-sheng-tu-upload-area:hover {
+            background: rgba(255,255,255,0.95);
+            border-color: #555;
+        }
+
+        .tu-sheng-tu-upload-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .tu-sheng-tu-upload-preview.visible {
+            display: block;
+        }
+
+        .tu-sheng-tu-upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .tu-sheng-tu-upload-hint.hidden {
+            display: none;
+        }
+
+        .tu-sheng-tu-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tu-sheng-tu-result-image {
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 15px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tu-sheng-tu-result-image.visible {
+            display: block;
+        }
+
+        .tu-sheng-tu-placeholder {
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1;
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .tu-sheng-tu-placeholder.hidden {
+            display: none;
+        }
+
+        .tu-sheng-tu-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tu-sheng-tu-bottom {
+            display: flex;
+            gap: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            justify-content: center;
+        }
+
+        .tu-sheng-tu-prompt {
+            flex: 1;
+            max-width: 400px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #333;
+            border-radius: 30px;
+            background: #fff;
+            outline: none;
+        }
+
+        .tu-sheng-tu-prompt:focus {
+            border-color: #666;
+        }
+
+        .tu-sheng-tu-btn {
+            padding: 15px 25px;
+            font-size: 1rem;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .tu-sheng-tu-btn:hover {
+            background: #555;
+        }
+
+        .tu-sheng-tu-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .tu-sheng-tu-btn.secondary {
+            background: transparent;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .tu-sheng-tu-btn.secondary:hover {
+            background: #333;
+            color: #fff;
+        }
+
         .chat-input-container {
             display: flex;
             gap: 15px;
@@ -313,6 +484,7 @@
             max-width: 800px;
             margin: 30px auto;
             text-align: center;
+            position: relative;
         }
 
         .upload-area {
@@ -325,9 +497,34 @@
             margin-bottom: 30px;
         }
 
-        .upload-area:hover {
-            background: rgba(255,255,255,0.95);
-            border-color: #555;
+        .prompt-input-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .prompt-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #333;
+            border-radius: 30px;
+            background: #fff;
+            outline: none;
+        }
+
+        .prompt-input:focus {
+            border-color: #666;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
         }
 
         .upload-area.dragover {
@@ -563,25 +760,31 @@
             <div class="back-btn" onclick="showPage('page-home')">←</div>
             <h2 class="page-title">文创实训坊 · 创意衍生</h2>
         </div>
-        <div class="upload-container">
-            <div class="upload-area" id="tu-sheng-tu-upload-area" onclick="document.getElementById('tu-sheng-tu-input').click()">
-                <div class="upload-icon">✨</div>
-                <div class="upload-text">点击或拖拽上传草图或作品</div>
-                <div class="upload-hint">支持 JPG、PNG、GIF、WebP 格式</div>
+        <div class="tu-sheng-tu-container">
+            <div class="tu-sheng-tu-left">
+                <div class="tu-sheng-tu-upload-area" id="tu-sheng-tu-upload-area" onclick="document.getElementById('tu-sheng-tu-input').click()">
+                    <img id="tu-sheng-tu-upload-preview" class="tu-sheng-tu-upload-preview" alt="预览">
+                    <div class="tu-sheng-tu-upload-hint" id="tu-sheng-tu-upload-hint">
+                        <div class="upload-icon">✨</div>
+                        <div class="upload-text">点击或拖拽上传草图或作品</div>
+                        <div class="upload-hint">支持 JPG、PNG、GIF、WebP 格式</div>
+                    </div>
+                </div>
+                <input type="file" id="tu-sheng-tu-input" accept="image/*" style="display:none" onchange="handleTuShengTuFile(this)">
             </div>
-            <input type="file" id="tu-sheng-tu-input" accept="image/*" style="display:none" onchange="handleTuShengTuFile(this)">
-            <img id="tu-sheng-tu-preview" class="upload-preview" alt="预览">
-            <div>
-                <button class="action-btn" id="tu-sheng-tu-submit" onclick="submitTuShengTu()" disabled>生成作品</button>
-                <button class="action-btn secondary" onclick="resetTuShengTu()">重新上传</button>
+            <div class="tu-sheng-tu-right">
+                <img id="tu-sheng-tu-image" class="tu-sheng-tu-result-image" alt="生成结果">
+                <div class="tu-sheng-tu-placeholder" id="tu-sheng-tu-placeholder">生成的图片将显示在这里</div>
+                <div class="loading tu-sheng-tu-loading" id="tu-sheng-tu-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">正在生成...</div>
+                </div>
             </div>
-            <div class="loading" id="tu-sheng-tu-loading">
-                <div class="loading-spinner"></div>
-                <div class="loading-text">正在生成创意作品...</div>
-            </div>
-            <div class="result-area" id="tu-sheng-tu-result">
-                <img id="tu-sheng-tu-image" class="result-image" alt="生成结果">
-            </div>
+        </div>
+        <div class="tu-sheng-tu-bottom">
+            <input type="text" class="tu-sheng-tu-prompt" id="tu-sheng-tu-prompt" placeholder="输入您的创意描述（选填）...">
+            <button class="tu-sheng-tu-btn" id="tu-sheng-tu-submit" onclick="submitTuShengTu()" disabled>生成作品</button>
+            <button class="tu-sheng-tu-btn secondary" onclick="resetTuShengTu()">重新上传</button>
         </div>
     </div>
 
@@ -821,37 +1024,79 @@
             if (!file) return;
 
             tuShengTuFile = file;
-            const preview = document.getElementById('tu-sheng-tu-preview');
+            const preview = document.getElementById('tu-sheng-tu-upload-preview');
+            const hint = document.getElementById('tu-sheng-tu-upload-hint');
             preview.src = URL.createObjectURL(file);
             preview.classList.add('visible');
+            hint.classList.add('hidden');
             document.getElementById('tu-sheng-tu-submit').disabled = false;
         }
 
         function resetTuShengTu() {
             tuShengTuFile = null;
             document.getElementById('tu-sheng-tu-input').value = '';
-            document.getElementById('tu-sheng-tu-preview').classList.remove('visible');
-            document.getElementById('tu-sheng-tu-preview').src = '';
+            const preview = document.getElementById('tu-sheng-tu-upload-preview');
+            const hint = document.getElementById('tu-sheng-tu-upload-hint');
+            preview.src = '';
+            preview.classList.remove('visible');
+            hint.classList.remove('hidden');
+            document.getElementById('tu-sheng-tu-prompt').value = '';
             document.getElementById('tu-sheng-tu-submit').disabled = true;
-            document.getElementById('tu-sheng-tu-result').classList.remove('visible');
+            document.getElementById('tu-sheng-tu-image').classList.remove('visible');
+            document.getElementById('tu-sheng-tu-image').src = '';
+            document.getElementById('tu-sheng-tu-placeholder').classList.remove('hidden');
         }
 
         async function submitTuShengTu() {
-            if (!tuShengTuFile) return;
+            if (!tuShengTuFile) {
+                console.log('No file selected');
+                return;
+            }
+
+            const prompt = document.getElementById('tu-sheng-tu-prompt').value.trim();
 
             const loading = document.getElementById('tu-sheng-tu-loading');
-            const result = document.getElementById('tu-sheng-tu-result');
             const btn = document.getElementById('tu-sheng-tu-submit');
 
+            console.log('Starting request...');
             loading.classList.add('visible');
-            result.classList.remove('visible');
             btn.disabled = true;
 
             try {
-                const base64 = await fileToBase64(tuShengTuFile);
-                const imageUrl = `data:${tuShengTuFile.type};base64,${base64}`;
-                const resultImage = document.getElementById('tu-sheng-tu-image');
+                // 先上传图片到 Dify，获取 file_id
+                console.log('Uploading image to Dify...');
 
+                // 将文件转换为 Blob
+                const fileBuffer = await tuShengTuFile.arrayBuffer();
+                const blob = new Blob([fileBuffer], { type: tuShengTuFile.type });
+
+                const formData = new FormData();
+                formData.append('file', blob, tuShengTuFile.name);
+                formData.append('user', 'student');
+
+                const uploadResponse = await fetch(`${API_BASE}/files/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + API_KEYS['tu-sheng-tu']
+                    },
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    console.error('Upload error:', errorText);
+                    throw new Error('图片上传失败');
+                }
+
+                const uploadData = JSON.parse(await uploadResponse.text());
+                console.log('Upload result:', uploadData);
+
+                const fileId = uploadData.id;
+                if (!fileId) {
+                    throw new Error('上传后未获取到文件ID');
+                }
+
+                console.log('Sending request to Dify...');
                 const response = await fetch(`${API_BASE}/chat-messages`, {
                     method: 'POST',
                     headers: {
@@ -860,72 +1105,60 @@
                     },
                     body: JSON.stringify({
                         "inputs": {},
-                        "query": "请根据这幅作品生成一个水墨风格的创意衍生图",
-                        "response_mode": "streaming",
+                        "query": prompt || "请根据这幅作品生成一个水墨风格的创意衍生图",
+                        "response_mode": "blocking",
                         "user": "student",
-                        "files": [{"type": "image", "transfer_method": "base64", "url": imageUrl}]
+                        "files": [{
+                            "type": "image",
+                            "transfer_method": "local_file",
+                            "upload_file_id": fileId
+                        }]
                     })
                 });
 
-                // 使用 streaming 模式解析 SSE
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let fullResponse = '';
+                console.log('Response status:', response.status);
+                const responseText = await response.text();
+                console.log('Full response text:', responseText);
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value, { stream: true });
-                    fullResponse += chunk;
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status}`);
                 }
 
-                // 解析 SSE 提取图片链接
-                const lines = fullResponse.split('\n');
+                console.log('Full response text:', responseText);
+
+                // blocking 模式返回的是 JSON，不是 SSE
+                try {
+                    const data = JSON.parse(responseText);
+                    console.log('Parsed JSON data:', JSON.stringify(data));
+                    if (data.answer) {
+                        fullResponse = data.answer;
+                    }
+                } catch (e) {
+                    console.log('Parse JSON error:', e.message);
+                }
+
+                console.log('Full response:', fullResponse);
+
+                // 从完整响应中提取图片
+                const imageMatch = fullResponse.match(/!\[.*?\]\((.*?)\)/);
                 let imageUrlFound = '';
-                let textReply = '';
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        try {
-                            const data = JSON.parse(line.substring(6));
-                            if (data.event === 'message' && data.answer) {
-                                textReply += data.answer;
-                                // 从 answer 中提取 markdown 图片
-                                const imageMatch = data.answer.match(/!\[.*?\]\((.*?)\)/);
-                                if (imageMatch && imageMatch[1]) {
-                                    imageUrlFound = imageMatch[1];
-                                }
-                            }
-                            if (data.event === 'message_end') {
-                                break;
-                            }
-                            if (data.event === 'error') {
-                                throw new Error(data.message || '请求失败');
-                            }
-                        } catch (e) {
-                            if (e.message !== 'JSON parse error') {
-                                throw e;
-                            }
-                        }
-                    }
+                if (imageMatch && imageMatch[1]) {
+                    imageUrlFound = imageMatch[1];
                 }
 
-                // 如果流式响应中没找到，再从完整响应中尝试提取
-                if (!imageUrlFound) {
-                    const imageMatch = textReply.match(/!\[.*?\]\((.*?)\)/);
-                    if (imageMatch && imageMatch[1]) {
-                        imageUrlFound = imageMatch[1];
-                    }
-                }
+                const resultImage = document.getElementById('tu-sheng-tu-image');
+                const placeholder = document.getElementById('tu-sheng-tu-placeholder');
 
                 if (imageUrlFound) {
                     resultImage.src = imageUrlFound;
-                    result.classList.add('visible');
-                } else {
+                    resultImage.classList.add('visible');
+                    placeholder.classList.add('hidden');
+                } else if (!fullResponse) {
+                    console.log('No image found in response, full response:', fullResponse);
                     alert('未能在响应中找到生成的图片');
                 }
             } catch (error) {
+                console.error('Submit error:', error);
                 alert('提交失败：' + error.message);
             }
 

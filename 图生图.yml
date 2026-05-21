@@ -10,7 +10,7 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.42@db089179610a44ce4ba3cf123e61cb75fe20441a609ec1b0364b43447ced7210
+    marketplace_plugin_unique_identifier: langgenius/moonshot:0.1.5@f787917088219dc4e74548419a79f6f542bf1eed5043e3c6684ff8e077fd79c6
     version: null
 - current_identifier: null
   type: marketplace
@@ -114,11 +114,12 @@ workflow:
       height: 90
       id: '1779195404941'
       position:
-        x: 80
-        y: 282
+        x: 0
+        y: 8.5
       positionAbsolute:
-        x: 80
-        y: 282
+        x: 0
+        y: 8.5
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -128,10 +129,7 @@ workflow:
           enabled: false
           variable_selector: []
         memory:
-          query_prompt_template: '{{#sys.query#}}
-
-
-            {{#sys.files#}}'
+          query_prompt_template: ''
           role_prefix:
             assistant: ''
             user: ''
@@ -139,17 +137,18 @@ workflow:
             enabled: true
             size: 10
         model:
-          completion_params:
-            temperature: 0.7
+          completion_params: {}
           mode: chat
-          name: qwen3.6-plus
-          provider: langgenius/tongyi/tongyi
+          name: kimi-k2.5
+          provider: langgenius/moonshot/moonshot
         prompt_template:
         - id: 4a4e260d-c480-46e8-807a-e066896ceb0d
           role: system
           text: '# 身份
 
+
             你是新潮时尚的水墨文创设计师，审美年轻化、语言精炼。
+
 
 
             # 核心规则（必须严格按顺序执行）
@@ -157,59 +156,37 @@ workflow:
 
             ## 阶段1：看图判断类别
 
+
             拿到图片后立即判断是哪一类：
+
 
             - A类：铅笔画/线稿/草图
 
+
             - B类：已完成的国画/水墨原作
+
 
             - C类：现成文创产品图
 
 
-            ## 阶段2：根据类别生成图片（直接调用 imagefile2image）
+
+            ## 阶段2：分析用户上传的图片的风格和细节
+
+
+
+            ## 阶段3：参考（如果用户有明确表示图片生成的要求），根据阶段1识别出来的图片类别，输出一段合适的要生成的图像的文本描述，也就是给大模型的提示词，简短精炼，不要太长。具体图片类别的生成方向严格遵照：
 
 
             ### A类 → 生成完整国风水墨作品
 
-            - prompt：纯水墨国画风格，笔触遒劲，墨色浓淡层次分明，宣纸质感，传统构图，留白意境，气韵生动
-
-            - input_image_file：用户上传的图片
-
 
             ### B类 → 生成水墨文创周边效果图
 
-            - prompt：水墨风格文创产品效果图（可选：书签/帆布包/手机壳/丝巾/茶具），保留水墨元素，时尚年轻化设计，商业产品展示
 
-            - input_image_file：用户上传的图片
+            ### C类 → 优化或改版文创设计
 
-
-            ### C类 → 优化/改版文创设计
-
-            - prompt：升级版文创设计效果图，更年轻化审美，保留核心水墨元素，商业产品展示，高级感
-
-            - input_image_file：用户上传的图片
-
-
-            ## 阶段3：文字点评（图片生成完成后）
-
-            输出必须简短，三句话：
-
-            1. 简短评价（5字内）
-
-            2. 设计理念（10字内）
-
-            3. 一句启发引导（15字内）
-
-
-            # 禁止
-
-            - 不要在文字中伪造图片链接
-
-            - 不要输出代码块
-
-            - 不要长篇大论
-
-            '
+            输出只要单纯的给下一个工作流节点的提示词，不要有其他多余的描述。'
+        reasoning_format: separated
         selected: false
         structured_output_enabled: false
         title: LLM
@@ -224,32 +201,30 @@ workflow:
       height: 108
       id: llm
       position:
-        x: 385.686252634615
-        y: 288.72717136835166
+        x: 342
+        y: 14.5
       positionAbsolute:
-        x: 385.686252634615
-        y: 288.72717136835166
+        x: 342
+        y: 14.5
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     - data:
-        answer: '{{#llm.text#}}
-
-          {{#1779195677400.files#}}'
+        answer: '{{#1779195677400.files#}}'
         selected: false
         title: 直接回复
         type: answer
         variables: []
-      height: 142
+      height: 120
       id: answer
       position:
-        x: 980
-        y: 282
+        x: 1026
+        y: 55.33333333333333
       positionAbsolute:
-        x: 980
-        y: 282
+        x: 1026
+        y: 55.33333333333333
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -484,7 +459,7 @@ workflow:
         provider_id: sawyer-shi/seedream_aigc/seedream_aigc
         provider_name: sawyer-shi/seedream_aigc/seedream_aigc
         provider_type: builtin
-        selected: false
+        selected: true
         title: Seedream-图生图
         tool_configurations:
           model:
@@ -513,18 +488,18 @@ workflow:
       height: 173
       id: '1779195677400'
       position:
-        x: 662.1411528453841
-        y: 308.9792618960987
+        x: 684
+        y: 0
       positionAbsolute:
-        x: 662.1411528453841
-        y: 308.9792618960987
+        x: 684
+        y: 0
       selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -477.31702460230326
-      y: 46.709891294629415
-      zoom: 1.189207106814081
+      x: 178.29228610273327
+      y: 231.69713239732363
+      zoom: 0.9899494800279817
   rag_pipeline_variables: []
