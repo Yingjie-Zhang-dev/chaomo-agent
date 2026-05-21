@@ -10,7 +10,7 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.42@db089179610a44ce4ba3cf123e61cb75fe20441a609ec1b0364b43447ced7210
+    marketplace_plugin_unique_identifier: langgenius/moonshot:0.1.5@f787917088219dc4e74548419a79f6f542bf1eed5043e3c6684ff8e077fd79c6
     version: null
 kind: app
 version: 0.6.0
@@ -86,7 +86,7 @@ workflow:
       type: custom
     nodes:
     - data:
-        selected: true
+        selected: false
         title: 用户输入
         type: start
         variables: []
@@ -98,7 +98,7 @@ workflow:
       positionAbsolute:
         x: 80
         y: 282
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -108,10 +108,7 @@ workflow:
           enabled: false
           variable_selector: []
         memory:
-          query_prompt_template: '{{#sys.query#}}
-
-
-            {{#sys.files#}}'
+          query_prompt_template: '{{#sys.query#}}'
           role_prefix:
             assistant: ''
             user: ''
@@ -120,17 +117,19 @@ workflow:
             size: 10
         model:
           completion_params:
-            temperature: 0.7
+            response_format: text
+            thinking: false
           mode: chat
-          name: qwen3.6-plus
-          provider: langgenius/tongyi/tongyi
+          name: kimi-k2.5
+          provider: langgenius/moonshot/moonshot
         prompt_template:
         - id: dd503807-ab6c-47e0-995d-ff76cb07543d
           role: system
           text: '你身份是美术馆馆长 + 高校文创校外企业导师，深耕水墨画艺术创作与水墨文创商业化应用多年，审美专业、视角多元，说话儒雅稳重、温和有涵养。
 
-            请查看学生上传的水墨画作品或者水墨文创作品 ，以鼓励肯定为基调，从画面构图、笔墨气韵、色彩意境、细节把控等艺术维度做专业点评；同时重点立足水墨文创落地应用视角，分析作品适合的文创场景（如周边、文具、国潮衍生品、装饰纹样等），给出笔墨调整、元素简化、构图适配、风格商业化等可落地的优化指导建议，点评专业易懂、建议贴合实际文创落地，语气亲和大气、具有引导性。'
-        selected: false
+            请查看学生上传的水墨画作品或者水墨文创作品 ，以鼓励肯定为基调，从画面构图、笔墨气韵、色彩意境、细节把控等艺术维度做专业点评；同时重点立足水墨文创落地应用视角，分析作品适合的文创场景，给出笔墨调整、元素简化、构图适配、风格商业化等可落地的优化指导建议，点评专业易懂、建议贴合实际文创落地，语气亲和大气、具有引导性。简要的几句点评就好，不要超过3句话。'
+        reasoning_format: separated
+        selected: true
         title: LLM
         type: llm
         vision:
@@ -148,6 +147,7 @@ workflow:
       positionAbsolute:
         x: 380
         y: 282
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -166,12 +166,13 @@ workflow:
       positionAbsolute:
         x: 680
         y: 282
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: 301
-      y: 13
+      x: 431
+      y: 120.5
       zoom: 1
   rag_pipeline_variables: []

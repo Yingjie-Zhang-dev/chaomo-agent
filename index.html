@@ -490,11 +490,52 @@
         .upload-area {
             border: 3px dashed #333;
             border-radius: 20px;
-            padding: 60px 40px;
             background: rgba(255,255,255,0.8);
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            min-height: 200px;
+        }
+
+        .upload-area.has-image {
+            padding: 0;
+            height: 300px;
+        }
+
+        .upload-area .upload-preview-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .upload-area .upload-preview-img.visible {
+            display: block;
+        }
+
+        .upload-area .upload-icon,
+        .upload-area .upload-text,
+        .upload-area .upload-hint {
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-area.has-image .upload-icon,
+        .upload-area.has-image .upload-text,
+        .upload-area.has-image .upload-hint {
+            display: none;
         }
 
         .prompt-input-container {
@@ -734,19 +775,19 @@
         </div>
         <div class="upload-container">
             <div class="upload-area" id="tu-sheng-wen-upload-area" onclick="document.getElementById('tu-sheng-wen-input').click()">
+                <img id="tu-sheng-wen-preview" class="upload-preview-img" alt="预览">
                 <div class="upload-icon">🎨</div>
                 <div class="upload-text">点击或拖拽上传水墨作品</div>
                 <div class="upload-hint">支持 JPG、PNG、GIF、WebP 格式</div>
             </div>
             <input type="file" id="tu-sheng-wen-input" accept="image/*" style="display:none" onchange="handleTuShengWenFile(this)">
-            <img id="tu-sheng-wen-preview" class="upload-preview" alt="预览">
             <div>
                 <button class="action-btn" id="tu-sheng-wen-submit" onclick="submitTuShengWen()" disabled>提交评价</button>
                 <button class="action-btn secondary" onclick="resetTuShengWen()">重新上传</button>
             </div>
             <div class="loading" id="tu-sheng-wen-loading">
                 <div class="loading-spinner"></div>
-                <div class="loading-text">墨老正在点评您的作品...</div>
+                <div class="loading-text">馆长正在端详您的作品...</div>
             </div>
             <div class="result-area" id="tu-sheng-wen-result">
                 <div class="result-text" id="tu-sheng-wen-text"></div>
@@ -924,16 +965,22 @@
 
             tuShengWenFile = file;
             const preview = document.getElementById('tu-sheng-wen-preview');
+            const uploadArea = document.getElementById('tu-sheng-wen-upload-area');
+
+            preview.onload = function() {
+                uploadArea.classList.add('has-image');
+                preview.classList.add('visible');
+            };
             preview.src = URL.createObjectURL(file);
-            preview.classList.add('visible');
             document.getElementById('tu-sheng-wen-submit').disabled = false;
         }
 
         function resetTuShengWen() {
             tuShengWenFile = null;
             document.getElementById('tu-sheng-wen-input').value = '';
-            document.getElementById('tu-sheng-wen-preview').classList.remove('visible');
             document.getElementById('tu-sheng-wen-preview').src = '';
+            document.getElementById('tu-sheng-wen-preview').classList.remove('visible');
+            document.getElementById('tu-sheng-wen-upload-area').classList.remove('has-image');
             document.getElementById('tu-sheng-wen-submit').disabled = true;
             document.getElementById('tu-sheng-wen-result').classList.remove('visible');
         }
@@ -950,10 +997,39 @@
             btn.disabled = true;
 
             try {
-                // 图片转 base64
-                const base64 = await fileToBase64(tuShengWenFile);
-                const imageUrl = `data:${tuShengWenFile.type};base64,${base64}`;
+                console.log('Uploading image to Dify...');
 
+                // 将文件转换为 Blob
+                const fileBuffer = await tuShengWenFile.arrayBuffer();
+                const blob = new Blob([fileBuffer], { type: tuShengWenFile.type });
+
+                const formData = new FormData();
+                formData.append('file', blob, tuShengWenFile.name);
+                formData.append('user', 'student');
+
+                const uploadResponse = await fetch(`${API_BASE}/files/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + API_KEYS['tu-sheng-wen']
+                    },
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    console.error('Upload error:', errorText);
+                    throw new Error('图片上传失败');
+                }
+
+                const uploadData = JSON.parse(await uploadResponse.text());
+                console.log('Upload result:', uploadData);
+
+                const fileId = uploadData.id;
+                if (!fileId) {
+                    throw new Error('上传后未获取到文件ID');
+                }
+
+                console.log('Sending request to Dify...');
                 const response = await fetch(`${API_BASE}/chat-messages`, {
                     method: 'POST',
                     headers: {
@@ -963,51 +1039,37 @@
                     body: JSON.stringify({
                         "inputs": {},
                         "query": "请评价这幅水墨画作品",
-                        "response_mode": "streaming",
+                        "response_mode": "blocking",
                         "user": "student",
-                        "files": [{"type": "image", "transfer_method": "base64", "url": imageUrl}]
+                        "files": [{
+                            "type": "image",
+                            "transfer_method": "local_file",
+                            "upload_file_id": fileId
+                        }]
                     })
                 });
 
-                // agent-chat 只支持 streaming，需要解析 SSE 流
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
+                console.log('Response status:', response.status);
+                const responseText = await response.text();
+                console.log('Full response text:', responseText);
+
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status}`);
+                }
+
+                // blocking 模式返回的是 JSON
                 const resultText = document.getElementById('tu-sheng-wen-text');
-                let reply = '';
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.substring(6));
-                                if (data.event === 'message' && data.answer) {
-                                    reply += data.answer;
-                                    resultText.textContent = reply;
-                                    result.classList.add('visible');
-                                }
-                                if (data.event === 'message_end') {
-                                    break;
-                                }
-                                if (data.event === 'error') {
-                                    throw new Error(data.message || '请求失败');
-                                }
-                            } catch (e) {
-                                // 忽略解析错误
-                            }
-                        }
-                    }
+                try {
+                    const data = JSON.parse(responseText);
+                    console.log('Parsed JSON data:', JSON.stringify(data));
+                    let reply = data.answer || '抱歉，无法获取评价。';
+                    resultText.textContent = reply;
+                    result.classList.add('visible');
+                } catch (e) {
+                    console.log('Parse JSON error:', e.message);
+                    resultText.textContent = '抱歉，无法获取评价。';
+                    result.classList.add('visible');
                 }
-
-                if (!reply) {
-                    reply = '抱歉，无法获取评价。';
-                }
-                resultText.textContent = reply;
-                result.classList.add('visible');
             } catch (error) {
                 alert('提交失败：' + error.message);
             }
