@@ -12,7 +12,10 @@
       "Bash(docker-compose restart *)",
       "Read(//c/Users/zhang/Desktop/**)",
       "Bash(fe223\")",
-      "WebFetch(domain:blog.csdn.net)"
+      "WebFetch(domain:blog.csdn.net)",
+      "Bash(where cpolar *)",
+      "Bash(npm init *)",
+      "Bash(npm install *)"
     ]
   }
 }
