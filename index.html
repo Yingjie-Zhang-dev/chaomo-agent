@@ -830,8 +830,27 @@
     </div>
 
     <script>
-        // API 配置
+        // =============================================
+        // 配置区域 - 部署前请修改这里的配置！
+        // =============================================
+        
+        // Dify API 配置
+        // 重要：如果 Dify 没有公网地址，需要使用内网穿透工具（如 cpolar）暴露到公网
+        // 内网穿透后，将 localhost 替换成穿透后的公网地址，如 https://xxxxx.cpolar.cn
+        
+        // 方式1：本地开发或内网穿透后
+        // const API_BASE = 'http://localhost/v1';
+        
+        // 方式2：使用 cpolar 等内网穿透工具（替换成你的穿透地址）
+        // const API_BASE = 'https://xxxxx.cpolar.cn/v1';
+        
+        // 方式3：如果你有 Dify 云版本或公网服务器
+        // const API_BASE = 'https://your-dify-server.com/v1';
+        
+        // 当前配置 - 本地开发模式（部署前请修改）
         const API_BASE = 'http://localhost/v1';
+        
+        // API Keys - 这些是 Dify 的 App ID，不是普通的 API Key
         const API_KEYS = {
             'wen-sheng-wen': 'app-D1knP5piW5W6qyr5VEILwGOF',
             'tu-sheng-wen': 'app-CIT2gCFfV1Hn33ccO1aOZVwO',
@@ -1189,6 +1208,7 @@
                 console.log('Full response text:', responseText);
 
                 // blocking 模式返回的是 JSON，不是 SSE
+                let fullResponse = '';
                 try {
                     const data = JSON.parse(responseText);
                     console.log('Parsed JSON data:', JSON.stringify(data));
