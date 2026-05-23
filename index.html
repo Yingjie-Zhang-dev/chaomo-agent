@@ -848,9 +848,9 @@
         // const API_BASE = 'https://your-dify-server.com/v1';
         
         // 当前配置 - LocalTunnel穿透（公网访问）
-        const API_BASE = 'https://tired-dots-itch.loca.lt/v1';
+        const API_BASE = '/agent/v1';
         
-        // API Keys - 这些是 Dify 的 App ID，不是普通的 API Key
+        // API Keys - 这些是 Dify 工作流的 API Key
         const API_KEYS = {
             'wen-sheng-wen': 'app-D1knP5piW5W6qyr5VEILwGOF',
             'tu-sheng-wen': 'app-CIT2gCFfV1Hn33ccO1aOZVwO',
@@ -1058,7 +1058,7 @@
                     body: JSON.stringify({
                         "inputs": {},
                         "query": "请评价这幅水墨画作品",
-                        "response_mode": "blocking",
+                        "response_mode": "streaming",
                         "user": "student",
                         "files": [{
                             "type": "image",
@@ -1069,26 +1069,43 @@
                 });
 
                 console.log('Response status:', response.status);
-                const responseText = await response.text();
-                console.log('Full response text:', responseText);
 
                 if (!response.ok) {
                     throw new Error(`请求失败: ${response.status}`);
                 }
 
-                // blocking 模式返回的是 JSON
+                // streaming 模式返回的是 SSE，需要逐行解析
                 const resultText = document.getElementById('tu-sheng-wen-text');
-                try {
-                    const data = JSON.parse(responseText);
-                    console.log('Parsed JSON data:', JSON.stringify(data));
-                    let reply = data.answer || '抱歉，无法获取评价。';
-                    resultText.textContent = reply;
-                    result.classList.add('visible');
-                } catch (e) {
-                    console.log('Parse JSON error:', e.message);
-                    resultText.textContent = '抱歉，无法获取评价。';
-                    result.classList.add('visible');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullReply = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                if (data.answer) {
+                                    fullReply += data.answer;
+                                }
+                            } catch (e) {
+                                // 忽略解析错误
+                            }
+                        }
+                    }
                 }
+
+                if (fullReply) {
+                    resultText.textContent = fullReply;
+                } else {
+                    resultText.textContent = '抱歉，无法获取评价。';
+                }
+                result.classList.add('visible');
             } catch (error) {
                 alert('提交失败：' + error.message);
             }
@@ -1187,7 +1204,7 @@
                     body: JSON.stringify({
                         "inputs": {},
                         "query": prompt || "请根据这幅作品生成一个水墨风格的创意衍生图",
-                        "response_mode": "blocking",
+                        "response_mode": "streaming",
                         "user": "student",
                         "files": [{
                             "type": "image",
@@ -1198,35 +1215,54 @@
                 });
 
                 console.log('Response status:', response.status);
-                const responseText = await response.text();
-                console.log('Full response text:', responseText);
 
                 if (!response.ok) {
                     throw new Error(`请求失败: ${response.status}`);
                 }
 
-                console.log('Full response text:', responseText);
-
-                // blocking 模式返回的是 JSON，不是 SSE
-                let fullResponse = '';
-                try {
-                    const data = JSON.parse(responseText);
-                    console.log('Parsed JSON data:', JSON.stringify(data));
-                    if (data.answer) {
-                        fullResponse = data.answer;
-                    }
-                } catch (e) {
-                    console.log('Parse JSON error:', e.message);
-                }
-
-                console.log('Full response:', fullResponse);
-
-                // 从完整响应中提取图片
-                const imageMatch = fullResponse.match(/!\[.*?\]\((.*?)\)/);
+                // streaming 模式返回的是 SSE，需要逐行解析
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullReply = '';
                 let imageUrlFound = '';
-                if (imageMatch && imageMatch[1]) {
-                    imageUrlFound = imageMatch[1];
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                if (data.answer) {
+                                    fullReply += data.answer;
+                                }
+                                // 从 files 数组提取图片 URL
+                                if (data.files && data.files.length > 0) {
+                                    for (const file of data.files) {
+                                        if (file.url) {
+                                            imageUrlFound = file.url;
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                // 忽略解析错误
+                            }
+                        }
+                    }
                 }
+
+                // Dify 返回的图片 URL 格式是 http://localhost/files/tools/xxx
+                // 浏览器无法直接访问 Docker 内网地址，需要通过 nginx 代理
+                // 将 http://localhost/files/ 替换为 /agent/files/
+                if (imageUrlFound && imageUrlFound.includes('localhost/files/')) {
+                    imageUrlFound = imageUrlFound.replace(/^http:\/\/[^/]+\/files\//, '/agent/files/');
+                }
+
+                console.log('Full reply:', fullReply);
+                console.log('Image URL found:', imageUrlFound);
 
                 const resultImage = document.getElementById('tu-sheng-tu-image');
                 const placeholder = document.getElementById('tu-sheng-tu-placeholder');
@@ -1235,8 +1271,8 @@
                     resultImage.src = imageUrlFound;
                     resultImage.classList.add('visible');
                     placeholder.classList.add('hidden');
-                } else if (!fullResponse) {
-                    console.log('No image found in response, full response:', fullResponse);
+                } else if (!fullReply) {
+                    console.log('No image found in response, full reply:', fullReply);
                     alert('未能在响应中找到生成的图片');
                 }
             } catch (error) {
