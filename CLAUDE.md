@@ -28,7 +28,7 @@ marked.min.js       # Markdown rendering library
 ## API Configuration
 
 API configuration is in `index.html` lines 837-858:
-- `API_BASE`: Dify endpoint (currently Servo tunnel: `https://9c7d87ba91f4847c-101-87-226-46.serveo.net/v1`)
+- `API_BASE`: Dify endpoint (currently cpolar tunnel: `http://1b693889.r39.cpolar.top/agent/v1`)
 - `API_KEYS`: Three Dify App IDs for wen-sheng-wen, tu-sheng-wen, tu-sheng-tu
 
 To change the endpoint, modify `API_BASE` and ensure Dify is accessible at that address.

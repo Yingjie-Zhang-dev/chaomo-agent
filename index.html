@@ -1131,6 +1131,188 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #666;
         }
+
+        /* 响应式设计 - 适配手机端 */
+        @media (max-width: 768px) {
+            /* 首页 */
+            .home-main-char, .home-char-mo {
+                font-size: 4rem;
+                margin-left: 0;
+                margin-top: 0;
+            }
+
+            .home-main-char {
+                margin-top: 30px;
+            }
+
+            .home-char-mo {
+                margin-top: 35px;
+                margin-left: 50px !important;
+            }
+
+            .home-left-title {
+                position: absolute;
+                left: 50%;
+                top: 5%;
+                transform: translateX(-50%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .home-circles {
+                flex-direction: column;
+                gap: 40px;
+                left: 50%;
+                top: 40%;
+                transform: translate(-50%, 0);
+                align-items: center;
+            }
+
+            .home-circles .home-circle:nth-child(1),
+            .home-circles .home-circle:nth-child(2),
+            .home-circles .home-circle:nth-child(3) {
+                margin-bottom: 0;
+            }
+
+            .home-circle {
+                width: 160px;
+                height: 160px;
+            }
+
+            .home-circle-title {
+                font-size: 1.2rem;
+            }
+
+            .home-circle-desc {
+                font-size: 0.8rem;
+            }
+
+            .home-top-title {
+                font-size: 1.2rem;
+            }
+
+            /* 图生图页面 */
+            .tu-sheng-tu-container {
+                flex-direction: column;
+                gap: 30px;
+                padding: 0 15px;
+            }
+
+            .tu-sheng-tu-left,
+            .tu-sheng-tu-right {
+                width: 100%;
+                max-width: 350px;
+                flex: none;
+            }
+
+            .tu-sheng-tu-bottom {
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 0 15px;
+            }
+
+            .tu-sheng-tu-avatar {
+                width: 45px;
+                height: 45px;
+            }
+
+            .tu-sheng-tu-prompt {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .tu-sheng-tu-btn {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+
+            /* 图生文画廊 */
+            .gallery-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .artwork-card {
+                border-radius: 10px;
+            }
+
+            .artwork-title {
+                font-size: 12px;
+            }
+
+            /* 详情页 */
+            .detail-container {
+                flex-direction: column;
+                padding: 0 15px;
+                gap: 20px;
+            }
+
+            .detail-left {
+                flex: none;
+                width: 100%;
+            }
+
+            .detail-right {
+                flex: none;
+                width: 100%;
+            }
+
+            .detail-artwork {
+                aspect-ratio: 1;
+            }
+
+            /* 文生文页面 */
+            .chat-container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .chat-messages {
+                padding: 15px;
+            }
+
+            .message-avatar {
+                width: 45px;
+                height: 45px;
+            }
+
+            /* 通用 */
+            .page-title {
+                font-size: 1.3rem;
+                letter-spacing: 0.3em;
+            }
+
+            .upload-btn-float {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                bottom: 25px;
+                right: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-main-char, .home-char-mo {
+                font-size: 4.5rem;
+            }
+
+            .home-circle {
+                width: 130px;
+                height: 130px;
+            }
+
+            .home-circle-title {
+                font-size: 1rem;
+            }
+
+            .gallery-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1715,16 +1897,16 @@
             return div.innerHTML;
         }
 
-        // 拖拽上传
-        setupDragUpload('tu-sheng-wen-upload-area', 'tu-sheng-wen-input', () => {
-            const preview = document.getElementById('tu-sheng-wen-preview');
-            if (preview.src) {
-                document.getElementById('tu-sheng-wen-submit').disabled = false;
-            }
-        });
+        // 拖拽上传 - 图生文已改为画廊模式，不再需要
+        // setupDragUpload('tu-sheng-wen-upload-area', 'tu-sheng-wen-input', () => {
+        //     const preview = document.getElementById('tu-sheng-wen-preview');
+        //     if (preview.src) {
+        //         document.getElementById('tu-sheng-wen-submit').disabled = false;
+        //     }
+        // });
 
         setupDragUpload('tu-sheng-tu-upload-area', 'tu-sheng-tu-input', () => {
-            const preview = document.getElementById('tu-sheng-tu-preview');
+            const preview = document.getElementById('tu-sheng-tu-upload-preview');
             if (preview.src) {
                 document.getElementById('tu-sheng-tu-submit').disabled = false;
             }
