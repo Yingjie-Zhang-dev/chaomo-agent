@@ -1194,8 +1194,249 @@
             background: #666;
         }
 
+        /* 登录按钮 */
+        .home-login-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 18px;
+            background: rgba(240,234,222,0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(200,180,150,0.4);
+            border-radius: 20px;
+            color: rgba(74,58,42,0.85);
+            font-family: 'STKaiti', serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .home-login-btn:hover {
+            background: rgba(240,234,222,0.7);
+            color: rgba(74,58,42,1);
+        }
+
+        .home-user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: rgba(240,234,222,0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(200,180,150,0.4);
+            border-radius: 20px;
+            font-family: 'STKaiti', serif;
+            font-size: 0.85rem;
+            color: rgba(74,58,42,0.85);
+            z-index: 100;
+        }
+
+        .home-user-info .logout-btn {
+            padding: 4px 12px;
+            background: #a83232;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* 登录注册弹窗 */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-modal {
+            background: rgba(240,234,222,0.98);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 380px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-title {
+            font-size: 1.4rem;
+            text-align: center;
+            color: #4a3a2a;
+            font-family: 'STXingkai', serif;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: rgba(180,160,140,0.2);
+            border: 1px solid rgba(180,160,140,0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'STKaiti', serif;
+            color: #4a3a2a;
+        }
+
+        .auth-tab.active {
+            background: #a83232;
+            color: #fff;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .auth-input {
+            padding: 12px 16px;
+            border: 1px solid #d4c7b0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'STKaiti', serif;
+            background: rgba(255,255,255,0.9);
+            outline: none;
+        }
+
+        .auth-input:focus {
+            border-color: #a83232;
+        }
+
+        .auth-submit {
+            padding: 14px;
+            background: #a83232;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-family: 'STKaiti', serif;
+            cursor: pointer;
+        }
+
+        .auth-submit:hover {
+            background: #8a2828;
+        }
+
+        .auth-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #8a7a6a;
+        }
+
+        /* 详情页可编辑标题 */
+        .detail-title-editable {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .detail-title-editable:hover {
+            background: rgba(168,50,50,0.1);
+        }
+
+        .detail-title-input {
+            font-size: 1.4rem;
+            font-family: 'STXingkai', serif;
+            color: #4a3a2a;
+            border: 1px solid #a83232;
+            border-radius: 4px;
+            padding: 4px 8px;
+            background: #fff;
+            outline: none;
+        }
+
+        /* 详情页删除按钮 */
+        .detail-delete-btn {
+            padding: 6px 14px;
+            background: #a83232;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: 'STKaiti', serif;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .detail-delete-btn:hover {
+            background: #8a2828;
+        }
+
+        .comment-delete-btn {
+            padding: 2px 8px;
+            background: rgba(180,160,140,0.3);
+            color: #4a3a2a;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .comment-delete-btn:hover {
+            background: rgba(168,50,50,0.2);
+        }
+
+        .comment-edit-btn {
+            padding: 2px 8px;
+            background: rgba(180,160,140,0.3);
+            color: #4a3a2a;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .comment-edit-btn:hover {
+            background: rgba(180,160,140,0.5);
+        }
+
         /* 响应式设计 - 适配手机端 */
         @media (max-width: 768px) {
+            /* 首页登录区域 - 手机端更小 */
+            .home-login-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                top: 12px;
+                right: 12px;
+            }
+
+            .home-user-info {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+                top: 12px;
+                right: 12px;
+                gap: 8px;
+            }
+
+            .home-user-info .logout-btn {
+                padding: 2px 8px;
+                font-size: 0.7rem;
+            }
+
             /* 首页 */
             .home-main-char, .home-char-mo {
                 font-size: 4rem;
@@ -1406,6 +1647,7 @@
         <div class="home-container">
             <!-- 顶部标题 -->
             <div class="home-top-title">水 墨 文 创 全 流 程 教 学 智 能 体</div>
+            <div id="home-auth-area"></div>
 
             <!-- 左侧主标题：潮墨 -->
             <div class="home-left-title">
@@ -1597,6 +1839,9 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
+            if (pageId === 'page-tu-sheng-wen') {
+                renderGallery();
+            }
         }
 
         // ============ 文生文 ============
@@ -1713,6 +1958,7 @@
         // ============ 图生文 ============
         let tuShengWenFile = null;
         let artworkGallery = JSON.parse(localStorage.getItem('artworkGallery') || '[]');
+        let currentDetailId = null;
 
         // 每次修改 gallery 后同步到 localStorage
         function saveGallery() {
@@ -1810,13 +2056,15 @@
                 }
 
                 // 6. 添加到画廊
+                const authorName = currentUser ? currentUser.username : '游客';
                 const artworkItem = {
                     id: uploadData.id,
                     fileId: fileId,
                     imageUrl: imageUrl,
                     title: '水墨作品 #' + (artworkGallery.length + 1),
-                    author: '游客',
-                    critique: critiqueText
+                    author: authorName,
+                    userId: currentUser ? currentUser.username : null,
+                    critiques: [{ author: '馆长 AI', text: critiqueText }]
                 };
 
                 artworkGallery.push(artworkItem);
@@ -1863,21 +2111,101 @@
             if (!artwork) return;
 
             document.getElementById('detail-artwork-img').src = artwork.imageUrl;
-            document.getElementById('detail-title').textContent = artwork.title;
+            document.getElementById('detail-title').innerHTML = `
+                <span class="detail-title-editable" id="detail-title-text">${escapeHtml(artwork.title)}</span>
+                <input type="text" id="detail-title-input" class="detail-title-input" value="${escapeHtml(artwork.title)}" style="display:none;">
+                ${artwork.userId === (currentUser ? currentUser.username : null) ? '<button class="detail-delete-btn" onclick="deleteArtwork()">删除作品</button>' : ''}
+            `;
             document.getElementById('detail-author').textContent = '作者：' + artwork.author;
 
-            // 显示 AI 评价
+            // 点击标题可编辑
+            document.getElementById('detail-title-text').onclick = () => {
+                if (artwork.userId === (currentUser ? currentUser.username : null)) {
+                    document.getElementById('detail-title-text').style.display = 'none';
+                    const input = document.getElementById('detail-title-input');
+                    input.style.display = 'inline-block';
+                    input.focus();
+                    input.onblur = () => {
+                        artwork.title = input.value;
+                        saveGallery();
+                        document.getElementById('detail-title-text').textContent = input.value;
+                        document.getElementById('detail-title-text').style.display = 'inline';
+                        input.style.display = 'none';
+                    };
+                }
+            };
+
+            // 显示评价
             const commentsContainer = document.getElementById('detail-comments');
-            commentsContainer.innerHTML = `
-                <div class="comment-card">
-                    <div class="comment-avatar">👤</div>
-                    <div class="comment-content">
-                        <div class="comment-author">馆长 AI</div>
-                        <div class="comment-text">${escapeHtml(artwork.critique || '暂无评价')}</div>
+            const critiques = artwork.critiques || [];
+            let commentsHtml = '';
+            critiques.forEach((c, index) => {
+                const canDelete = currentUser && c.author === currentUser.username;
+                const canEdit = currentUser && c.author === currentUser.username;
+                const is馆长 = c.author === '馆长 AI';
+                const avatarHtml = is馆长
+                    ? `<img src="背景图/馆长.jpg" alt="馆长" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👤</div>`;
+                const actionBtns = (canDelete || canEdit) ? `<div style="margin-top:8px;display:flex;gap:8px;">${canEdit ? '<button class="comment-edit-btn" onclick="editComment(\'' + id + '\', ' + index + ')">编辑</button>' : ''}${canDelete ? '<button class="comment-delete-btn" onclick="deleteComment(\'' + id + '\', ' + index + ')">删除</button>' : ''}</div>` : '';
+                commentsHtml += `
+                    <div class="comment-card">
+                        <div class="comment-avatar">${avatarHtml}</div>
+                        <div class="comment-content">
+                            <div class="comment-author">${escapeHtml(c.author)}</div>
+                            <div class="comment-text" id="critique-text-${id}-${index}">${escapeHtml(c.text)}</div>
+                            <div class="comment-edit-area" id="critique-edit-${id}-${index}" style="display:none;">
+                                <textarea class="auth-input" id="critique-edit-input-${id}-${index}" rows="3" style="width:100%;resize:none;margin-top:8px;">${escapeHtml(c.text)}</textarea>
+                                <div style="display:flex;gap:8px;margin-top:8px;">
+                                    <button class="action-btn" onclick="saveComment('${id}', ${index})" style="padding:8px 16px;margin:0;">保存</button>
+                                    <button class="action-btn secondary" onclick="cancelEditComment('${id}', ${index})" style="padding:8px 16px;margin:0;">取消</button>
+                                </div>
+                            </div>
+                            ${actionBtns}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            });
+            commentsContainer.innerHTML = commentsHtml;
+            currentDetailId = id;
             showPage('page-tu-sheng-wen-detail');
+        }
+
+        function deleteArtwork() {
+            if (!confirm('确定要删除这幅作品吗？')) return;
+            artworkGallery = artworkGallery.filter(a => a.id !== currentDetailId);
+            saveGallery();
+            renderGallery();
+            showPage('page-tu-sheng-wen');
+        }
+
+        function editComment(artworkId, commentIndex) {
+            document.getElementById('critique-text-' + artworkId + '-' + commentIndex).style.display = 'none';
+            document.getElementById('critique-edit-' + artworkId + '-' + commentIndex).style.display = 'block';
+        }
+
+        function cancelEditComment(artworkId, commentIndex) {
+            document.getElementById('critique-text-' + artworkId + '-' + commentIndex).style.display = 'block';
+            document.getElementById('critique-edit-' + artworkId + '-' + commentIndex).style.display = 'none';
+        }
+
+        function saveComment(artworkId, commentIndex) {
+            const newText = document.getElementById('critique-edit-input-' + artworkId + '-' + commentIndex).value.trim();
+            if (!newText) return;
+            const artwork = artworkGallery.find(a => a.id === artworkId);
+            if (artwork && artwork.critiques) {
+                artwork.critiques[commentIndex].text = newText;
+                saveGallery();
+                showArtworkDetail(artworkId);
+            }
+        }
+
+        function deleteComment(artworkId, commentIndex) {
+            const artwork = artworkGallery.find(a => a.id === artworkId);
+            if (artwork && artwork.critiques) {
+                artwork.critiques.splice(commentIndex, 1);
+                saveGallery();
+                showArtworkDetail(artworkId);
+            }
         }
 
         function submitComment() {
@@ -1885,14 +2213,25 @@
             const text = input.value.trim();
             if (!text) return;
 
+            const authorName = currentUser ? currentUser.username : '游客';
+
+            // 持久化到 localStorage
+            const artwork = artworkGallery.find(a => a.id === currentDetailId);
+            if (artwork) {
+                if (!artwork.critiques) artwork.critiques = [];
+                artwork.critiques.push({ author: authorName, text: text });
+                saveGallery();
+            }
+
+            // 追加到当前评论列表
             const commentsContainer = document.getElementById('detail-comments');
             const newComment = document.createElement('div');
             newComment.className = 'comment-card';
             newComment.innerHTML = `
                 <div class="comment-avatar">👤</div>
                 <div class="comment-content">
-                    <div class="comment-author">游客</div>
-                    <div class="comment-text">${text}</div>
+                    <div class="comment-author">${escapeHtml(authorName)}</div>
+                    <div class="comment-text">${escapeHtml(text)}</div>
                 </div>
             `;
             commentsContainer.appendChild(newComment);
@@ -2158,6 +2497,101 @@
                 }
             });
         }
+
+        // ============ 登录注册 ============
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+        function renderHomeAuthArea() {
+            const area = document.getElementById('home-auth-area');
+            if (currentUser) {
+                area.innerHTML = `
+                    <div class="home-user-info">
+                        <span>欢迎，${escapeHtml(currentUser.username)}</span>
+                        <button class="logout-btn" onclick="logout()">退出</button>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `<button class="home-login-btn" onclick="showAuth()">登录/注册</button>`;
+            }
+        }
+
+        function showAuth() {
+            const overlay = document.getElementById('auth-overlay');
+            overlay.style.display = 'flex';
+        }
+
+        function closeAuth() {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('auth-username').value = '';
+            document.getElementById('auth-password').value = '';
+        }
+
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.auth-tab[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
+            document.getElementById('auth-submit').textContent = tab === 'login' ? '登录' : '注册';
+            document.getElementById('auth-title').textContent = tab === 'login' ? '登录' : '注册';
+        }
+
+        function handleAuthSubmit() {
+            const isLogin = document.querySelector('.auth-tab.active').getAttribute('onclick').includes("'login'");
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            if (!username || !password) {
+                alert('请输入用户名和密码');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+            if (isLogin) {
+                if (users[username] && users[username] === password) {
+                    currentUser = { username };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    closeAuth();
+                    renderHomeAuthArea();
+                } else {
+                    alert('用户名或密码错误');
+                }
+            } else {
+                if (users[username]) {
+                    alert('用户名已存在');
+                    return;
+                }
+                users[username] = password;
+                localStorage.setItem('users', JSON.stringify(users));
+                currentUser = { username };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                closeAuth();
+                renderHomeAuthArea();
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            renderHomeAuthArea();
+        }
+
+        // 初始化首页登录区域
+        renderHomeAuthArea();
     </script>
+    <!-- 登录注册弹窗 -->
+    <div class="auth-overlay" id="auth-overlay">
+        <div class="auth-modal" style="position: relative;">
+            <div class="auth-close" onclick="closeAuth()">&times;</div>
+            <div class="auth-title" id="auth-title">登录</div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">登录</div>
+                <div class="auth-tab" onclick="switchAuthTab('register')">注册</div>
+            </div>
+            <div class="auth-form">
+                <input type="text" id="auth-username" class="auth-input" placeholder="请输入用户名">
+                <input type="password" id="auth-password" class="auth-input" placeholder="请输入密码">
+                <button class="auth-submit" id="auth-submit" onclick="handleAuthSubmit()">登录</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
