@@ -757,17 +757,6 @@
             background: rgba(240,234,222,0.8);
         }
 
-        .upload-preview-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 14px;
-            display: none;
-        }
-
         .upload-icon {
             font-size: 2.8rem;
             margin-bottom: 12px;
@@ -867,6 +856,71 @@
             color: #8a7a6a;
             display: flex;
             justify-content: space-between;
+        }
+
+        /* 图生文上传预览浮层 */
+        .upload-preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-preview-modal {
+            background: rgba(240,234,222,0.95);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .upload-preview-img {
+            width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .upload-preview-loading {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .upload-preview-critique {
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .critique-title {
+            font-size: 1.2rem;
+            color: #4a3a2a;
+            font-family: 'STXingkai', serif;
+            margin-bottom: 10px;
+        }
+
+        .critique-text {
+            font-size: 1rem;
+            color: #5a4a3a;
+            font-family: 'STKaiti', serif;
+            line-height: 1.8;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            margin-bottom: 15px;
         }
 
         .upload-btn-float {
@@ -1412,6 +1466,20 @@
         <div class="gallery-container" id="gallery-container">
             <div class="gallery-empty">暂无作品上传</div>
         </div>
+        <div class="upload-preview-overlay" id="tu-sheng-wen-overlay" style="display: none;">
+            <div class="upload-preview-modal">
+                <img id="tu-sheng-wen-preview-img" class="upload-preview-img" src="" alt="预览">
+                <div class="upload-preview-loading" id="tu-sheng-wen-preview-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">馆长正在点评...</div>
+                </div>
+                <div class="upload-preview-critique" id="tu-sheng-wen-preview-critique" style="display: none;">
+                    <div class="critique-title">馆长点评</div>
+                    <div class="critique-text" id="tu-sheng-wen-critique-text"></div>
+                    <button class="action-btn" onclick="closeTuShengWenOverlay()">完成</button>
+                </div>
+            </div>
+        </div>
         <div class="upload-btn-float" onclick="document.getElementById('tu-sheng-wen-input').click()">+</div>
         <input type="file" id="tu-sheng-wen-input" accept="image/*" style="display:none" onchange="handleTuShengWenFile(this)">
     </div>
@@ -1644,7 +1712,12 @@
 
         // ============ 图生文 ============
         let tuShengWenFile = null;
-        let artworkGallery = [];
+        let artworkGallery = JSON.parse(localStorage.getItem('artworkGallery') || '[]');
+
+        // 每次修改 gallery 后同步到 localStorage
+        function saveGallery() {
+            localStorage.setItem('artworkGallery', JSON.stringify(artworkGallery));
+        }
 
         function handleTuShengWenFile(input) {
             const file = input.files[0];
@@ -1656,11 +1729,30 @@
 
         async function uploadAndShowInGallery(file) {
             try {
-                const formData = new FormData();
-                formData.append('file', file, file.name);
+                // 1. 先显示预览图片
+                const overlay = document.getElementById('tu-sheng-wen-overlay');
+                const previewImg = document.getElementById('tu-sheng-wen-preview-img');
+                const previewLoading = document.getElementById('tu-sheng-wen-preview-loading');
+                const previewCritique = document.getElementById('tu-sheng-wen-preview-critique');
 
-                const uploadResponse = await fetch('http://localhost:3001/upload', {
+                previewImg.src = URL.createObjectURL(file);
+                previewLoading.style.display = 'flex';
+                previewCritique.style.display = 'none';
+                overlay.style.display = 'flex';
+
+                const fileBuffer = await file.arrayBuffer();
+                const blob = new Blob([fileBuffer], { type: file.type });
+
+                // 2. 上传到 Dify 获取 file_id
+                const formData = new FormData();
+                formData.append('file', blob, file.name);
+                formData.append('user', 'student');
+
+                const uploadResponse = await fetch(`${API_BASE}/files/upload`, {
                     method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + API_KEYS['tu-sheng-wen']
+                    },
                     body: formData
                 });
 
@@ -1669,21 +1761,77 @@
                 }
 
                 const uploadData = JSON.parse(await uploadResponse.text());
-                const imageUrl = uploadData.url;
+                const fileId = uploadData.id;
 
+                // 3. 发送到 Dify 工作流获取 AI 评价
+                const critiqueResponse = await fetch(`${API_BASE}/chat-messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + API_KEYS['tu-sheng-wen']
+                    },
+                    body: JSON.stringify({
+                        "inputs": {},
+                        "query": "请评价这幅水墨作品",
+                        "response_mode": "blocking",
+                        "user": "student",
+                        "files": [{
+                            "type": "image",
+                            "transfer_method": "local_file",
+                            "upload_file_id": fileId
+                        }]
+                    })
+                });
+
+                let critiqueText = '暂无评价';
+                if (critiqueResponse.ok) {
+                    const critiqueData = JSON.parse(await critiqueResponse.text());
+                    critiqueText = critiqueData.answer || '暂无评价';
+                }
+
+                // 4. 显示评价
+                document.getElementById('tu-sheng-wen-critique-text').textContent = critiqueText;
+                previewLoading.style.display = 'none';
+                previewCritique.style.display = 'block';
+
+                // 5. 上传到本地服务器获取公网可访问的 URL
+                const localFormData = new FormData();
+                localFormData.append('file', blob, file.name);
+
+                let imageUrl = '';
+                const localUploadResponse = await fetch('http://localhost:3001/upload', {
+                    method: 'POST',
+                    body: localFormData
+                });
+
+                if (localUploadResponse.ok) {
+                    const localData = JSON.parse(await localUploadResponse.text());
+                    imageUrl = localData.url;
+                }
+
+                // 6. 添加到画廊
                 const artworkItem = {
                     id: uploadData.id,
-                    fileId: uploadData.id,
+                    fileId: fileId,
                     imageUrl: imageUrl,
                     title: '水墨作品 #' + (artworkGallery.length + 1),
-                    author: '游客'
+                    author: '游客',
+                    critique: critiqueText
                 };
 
                 artworkGallery.push(artworkItem);
+                saveGallery();
                 renderGallery();
+
             } catch (error) {
                 alert('上传失败：' + error.message);
+                closeTuShengWenOverlay();
             }
+        }
+
+        function closeTuShengWenOverlay() {
+            const overlay = document.getElementById('tu-sheng-wen-overlay');
+            overlay.style.display = 'none';
         }
 
         function renderGallery() {
@@ -1694,14 +1842,14 @@
             }
 
             let html = '';
-            artworkGallery.forEach(artwork => {
+            artworkGallery.forEach((artwork, index) => {
                 html += `
-                    <div class="artwork-card" onclick="showArtworkDetail(${artwork.id})">
-                        <img class="artwork-thumb" src="${artwork.imageUrl}" alt="${artwork.title}">
+                    <div class="artwork-card" onclick="showArtworkDetail('${escapeHtml(artwork.id)}')">
+                        <img class="artwork-thumb" src="${escapeHtml(artwork.imageUrl)}" alt="${escapeHtml(artwork.title)}">
                         <div class="artwork-info">
-                            <div class="artwork-title">${artwork.title}</div>
+                            <div class="artwork-title">${escapeHtml(artwork.title)}</div>
                             <div class="artwork-meta">
-                                <span>👤 ${artwork.author}</span>
+                                <span>👤 ${escapeHtml(artwork.author)}</span>
                             </div>
                         </div>
                     </div>
@@ -1717,6 +1865,18 @@
             document.getElementById('detail-artwork-img').src = artwork.imageUrl;
             document.getElementById('detail-title').textContent = artwork.title;
             document.getElementById('detail-author').textContent = '作者：' + artwork.author;
+
+            // 显示 AI 评价
+            const commentsContainer = document.getElementById('detail-comments');
+            commentsContainer.innerHTML = `
+                <div class="comment-card">
+                    <div class="comment-avatar">👤</div>
+                    <div class="comment-content">
+                        <div class="comment-author">馆长 AI</div>
+                        <div class="comment-text">${escapeHtml(artwork.critique || '暂无评价')}</div>
+                    </div>
+                </div>
+            `;
             showPage('page-tu-sheng-wen-detail');
         }
 
@@ -1917,9 +2077,13 @@
                 }
             } catch (error) {
                 if (error.name === 'AbortError') {
-                    document.getElementById('tu-sheng-tu-placeholder').textContent = '已取消生成';
-                    document.getElementById('tu-sheng-tu-placeholder').classList.remove('hidden');
+                    const placeholder = document.getElementById('tu-sheng-tu-placeholder');
+                    placeholder.textContent = '已取消生成';
+                    placeholder.classList.remove('hidden');
                     document.getElementById('tu-sheng-tu-signer').classList.add('hidden');
+                    setTimeout(() => {
+                        placeholder.textContent = '生成的图片将显示在这里';
+                    }, 3000);
                 } else {
                     console.error('Submit error:', error);
                     alert('提交失败：' + error.message);
