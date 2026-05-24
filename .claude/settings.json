@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cpolar http *)",
+      "Read(//tmp/**)",
+      "Bash(curl -s --connect-timeout 5 http://localhost:8080/agent/v1/chat-messages)"
+    ]
+  }
+}

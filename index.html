@@ -1416,25 +1416,36 @@
 
         /* 响应式设计 - 适配手机端 */
         @media (max-width: 768px) {
-            /* 首页登录区域 - 手机端更小 */
+            /* 首页登录区域 - 手机端右上角，放在标题上方 */
             .home-login-btn {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-                top: 12px;
+                position: absolute;
+                top: 8px;
                 right: 12px;
+                padding: 5px 12px;
+                font-size: 0.75rem;
+                z-index: 100;
             }
 
             .home-user-info {
-                padding: 5px 10px;
-                font-size: 0.75rem;
-                top: 12px;
+                position: absolute;
+                top: 8px;
                 right: 12px;
-                gap: 8px;
+                padding: 5px 10px;
+                font-size: 0.7rem;
+                gap: 6px;
+                z-index: 100;
             }
 
             .home-user-info .logout-btn {
-                padding: 2px 8px;
-                font-size: 0.7rem;
+                padding: 2px 6px;
+                font-size: 0.65rem;
+            }
+
+            /* 首页顶部标题 - 手机端往下移避开按钮 */
+            .home-top-title {
+                top: 40px;
+                font-size: 1rem;
+                z-index: 10;
             }
 
             /* 首页 */
