@@ -1,0 +1,24 @@
+# Claude Code
+.claude/
+
+# VSCode
+.vscode/
+
+# 临时文件
+~$*
+*.tmp
+
+# 上传目录
+uploads/
+
+# Bug 报告目录
+bugs/
+
+# Node.js 运行时（如果 server.js 是 Node 服务端）
+node_modules/
+
+# 日志
+*.log
+
+# 桌面服务存储（Mac）
+.DS_Store
