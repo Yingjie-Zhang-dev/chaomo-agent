@@ -45,3 +45,25 @@ To change the endpoint, modify `API_BASE` and ensure Dify is accessible at that 
 1. **水墨知识站** (Wen Sheng Wen): User query → Dify (question classifier → knowledge retrieval → LLM) → Streaming text response
 2. **作品交流馆** (Tu Sheng Wen): Image upload → Dify LLM with vision → Blocking text critique
 3. **文创实训坊** (Tu Sheng Tu): Image upload + optional prompt → Dify LLM (vision) → Seedream tool → Generated image URL
+
+## Dify Nginx 配置要点
+
+修改 `C:/Users/zhang/Downloads/dify-main/docker/nginx/conf.d/default.conf.template` 中的 proxy_pass 时，如果 upstream 路径和请求路径不同，**必须显式指定目标路径后缀**：
+
+```nginx
+# 错误：保留完整请求路径 /agent/v1/xxx → api:5001/agent/v1/xxx (404)
+location /agent/v1 {
+    proxy_pass http://api:5001;
+}
+
+# 正确：重写路径 /agent/v1 → /v1
+location /agent/v1 {
+    proxy_pass http://api:5001/v1;
+}
+
+location /agent/files {
+    proxy_pass http://api:5001/files;  # 同理
+}
+```
+
+**常见坑**：Dify 的 nginx 模板中，`/agent/v1` 和 `/agent/files` 这类 location 如果只写 `proxy_pass http://api:5001` 不带后缀，会导致请求路径错误，返回 404/502。

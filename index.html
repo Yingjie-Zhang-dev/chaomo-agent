@@ -431,6 +431,14 @@
             display: none;
         }
 
+        .tu-sheng-tu-upload-preview.visible {
+            display: block;
+        }
+
+        .tu-sheng-tu-upload-hint.hidden {
+            display: none;
+        }
+
         .tu-sheng-tu-upload-hint {
             text-align: center;
         }
@@ -1141,30 +1149,27 @@
                 margin-top: 0;
             }
 
-            .home-main-char {
-                margin-top: 30px;
-            }
-
-            .home-char-mo {
-                margin-top: 35px;
-                margin-left: 50px !important;
-            }
-
             .home-left-title {
                 position: absolute;
                 left: 50%;
-                top: 5%;
+                top: 12%;
                 transform: translateX(-50%);
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
                 align-items: center;
+                gap: 8px;
+            }
+
+            .home-char-mo {
+                margin-top: 0;
+                margin-left: 0 !important;
             }
 
             .home-circles {
                 flex-direction: column;
                 gap: 40px;
                 left: 50%;
-                top: 40%;
+                top: 28%;
                 transform: translate(-50%, 0);
                 align-items: center;
             }
@@ -1190,6 +1195,19 @@
 
             .home-top-title {
                 font-size: 1.2rem;
+            }
+
+            /* 底部金色分割线 - 手机端固定在页面底部 */
+            .home-bottom-line {
+                position: fixed;
+                bottom: 0;
+                left: 5%;
+                width: 90%;
+            }
+
+            .home-bottom-text {
+                position: fixed;
+                bottom: 15px;
             }
 
             /* 图生图页面 */
@@ -1449,6 +1467,10 @@
                         <img id="tu-sheng-tu-image" class="tu-sheng-tu-result-image" alt="生成结果">
                     </div>
                     <div class="tu-sheng-tu-placeholder" id="tu-sheng-tu-placeholder">生成的图片将显示在这里</div>
+                    <div class="tu-sheng-tu-signer hidden" id="tu-sheng-tu-signer">
+                        <img src="背景图/学姐.png" class="signer-avatar" alt="签章">
+                        <span class="signer-name">青禾学姐</span>
+                    </div>
                 </div>
                 <div class="loading tu-sheng-tu-loading" id="tu-sheng-tu-loading">
                     <div class="loading-spinner"></div>
