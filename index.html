@@ -1149,6 +1149,14 @@
                 margin-top: 0;
             }
 
+            .home-char-mo {
+                color: rgba(255,255,255,0.9);
+                background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.95) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
             .home-left-title {
                 position: absolute;
                 left: 50%;
@@ -1467,9 +1475,9 @@
                         <img id="tu-sheng-tu-image" class="tu-sheng-tu-result-image" alt="生成结果">
                     </div>
                     <div class="tu-sheng-tu-placeholder" id="tu-sheng-tu-placeholder">生成的图片将显示在这里</div>
-                    <div class="tu-sheng-tu-signer hidden" id="tu-sheng-tu-signer">
+                    <div class="tu-sheng-tu-signer hidden" id="tu-sheng-tu-signer" style="cursor: pointer;">
                         <img src="背景图/学姐.png" class="signer-avatar" alt="签章">
-                        <span class="signer-name">青禾学姐</span>
+                        <span class="signer-name">跟学姐要</span>
                     </div>
                 </div>
                 <div class="loading tu-sheng-tu-loading" id="tu-sheng-tu-loading">
@@ -1889,7 +1897,9 @@
                     resultImage.src = imageUrlFound;
                     resultImage.classList.add('visible');
                     placeholder.classList.add('hidden');
-                    document.getElementById('tu-sheng-tu-signer').classList.remove('hidden');
+                    const signer = document.getElementById('tu-sheng-tu-signer');
+                    signer.classList.remove('hidden');
+                    signer.onclick = () => downloadImage(imageUrlFound);
                 } else if (!fullReply) {
                     console.log('No image found in response, full reply:', fullReply);
                     alert('未能在响应中找到生成的图片');
@@ -1917,6 +1927,13 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function downloadImage(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '水墨作品_' + Date.now() + '.png';
+            a.click();
         }
 
         // 拖拽上传 - 图生文已改为画廊模式，不再需要
