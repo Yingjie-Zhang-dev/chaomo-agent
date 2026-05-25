@@ -2056,14 +2056,15 @@
                 localFormData.append('file', blob, file.name);
 
                 let imageUrl = '';
-                const localUploadResponse = await fetch('http://localhost:3001/upload', {
+                const localUploadResponse = await fetch('/agent/upload', {
                     method: 'POST',
                     body: localFormData
                 });
 
                 if (localUploadResponse.ok) {
                     const localData = JSON.parse(await localUploadResponse.text());
-                    imageUrl = localData.url;
+                    // 将 localhost:3001/uploads 转换为 /agent/uploads 让 nginx 代理
+                    imageUrl = localData.url.replace(/http:\/\/localhost:3001\/uploads/, '/agent/uploads');
                 }
 
                 // 6. 添加到画廊
