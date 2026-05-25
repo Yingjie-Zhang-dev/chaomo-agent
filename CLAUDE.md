@@ -56,14 +56,15 @@ location /agent/v1 {
     proxy_pass http://api:5001/v1;  # ✓ 正确：重写路径
 }
 
-# 文件上传代理 - 转发到本地 server.js
+# 文件上传代理 - 转发到宿主机 server.js
+# 注意：Docker 容器内 localhost 指向容器自己，需要用宿主机 IP
 location /agent/upload {
-    proxy_pass http://localhost:3001/upload;
+    proxy_pass http://192.168.71.11:3001/upload;
     include proxy.conf;
 }
 
 location /agent/uploads {
-    proxy_pass http://localhost:3001/uploads;
+    proxy_pass http://192.168.71.11:3001/uploads;
     include proxy.conf;
 }
 
