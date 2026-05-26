@@ -3,7 +3,7 @@
 一个基于水墨艺术风格的 AI 智能助手 Web 应用，提供水墨知识问答、作品评价和创意图像生成三大功能。
 
 复制网址到浏览器访问（后续可能会更新）：
-http://1c31918f.r16.vip.cpolar.cn/agent/
+http://chaomo.vip.cpolar.top/agent/
 
 ## 功能介绍
 
