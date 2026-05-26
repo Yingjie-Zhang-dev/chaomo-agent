@@ -1987,6 +1987,7 @@
         async function uploadAndShowInGallery(file) {
             try {
                 // 1. 先显示预览图片
+                console.log('步骤1：显示预览图片');
                 const overlay = document.getElementById('tu-sheng-wen-overlay');
                 const previewImg = document.getElementById('tu-sheng-wen-preview-img');
                 const previewLoading = document.getElementById('tu-sheng-wen-preview-loading');
@@ -1997,6 +1998,7 @@
                 previewCritique.style.display = 'none';
                 overlay.style.display = 'flex';
 
+                console.log('步骤2：上传图片到 Dify...');
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('user', 'student');
@@ -2010,13 +2012,16 @@
                 });
 
                 if (!uploadResponse.ok) {
+                    console.error('上传失败：', uploadResponse.status);
                     throw new Error('图片上传失败');
                 }
 
                 const uploadData = JSON.parse(await uploadResponse.text());
                 const fileId = uploadData.id;
+                console.log('上传成功，fileId：', fileId);
 
                 // 3. 发送到 Dify 工作流获取 AI 评价
+                console.log('步骤3：AI 评价中...');
                 const critiqueResponse = await fetch(`${API_BASE}/chat-messages`, {
                     method: 'POST',
                     headers: {
@@ -2040,6 +2045,9 @@
                 if (critiqueResponse.ok) {
                     const critiqueData = JSON.parse(await critiqueResponse.text());
                     critiqueText = critiqueData.answer || '暂无评价';
+                    console.log('AI 评价完成');
+                } else {
+                    console.error('评价失败：', critiqueResponse.status);
                 }
 
                 // 4. 显示评价
