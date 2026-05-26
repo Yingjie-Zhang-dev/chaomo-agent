@@ -1997,12 +1997,8 @@
                 previewCritique.style.display = 'none';
                 overlay.style.display = 'flex';
 
-                const fileBuffer = await file.arrayBuffer();
-                const blob = new Blob([fileBuffer], { type: file.type });
-
-                // 2. 上传到 Dify 获取 file_id
                 const formData = new FormData();
-                formData.append('file', blob, file.name);
+                formData.append('file', file);
                 formData.append('user', 'student');
 
                 const uploadResponse = await fetch(`${API_BASE}/files/upload`, {
@@ -2051,28 +2047,12 @@
                 previewLoading.style.display = 'none';
                 previewCritique.style.display = 'block';
 
-                // 5. 上传到本地服务器获取公网可访问的 URL
-                const localFormData = new FormData();
-                localFormData.append('file', blob, file.name);
-
-                let imageUrl = '';
-                const localUploadResponse = await fetch('/agent/upload', {
-                    method: 'POST',
-                    body: localFormData
-                });
-
-                if (localUploadResponse.ok) {
-                    const localData = JSON.parse(await localUploadResponse.text());
-                    // 将 localhost:3001/uploads 转换为 /agent/uploads 让 nginx 代理
-                    imageUrl = localData.url.replace(/http:\/\/localhost:3001\/uploads/, '/agent/uploads');
-                }
-
-                // 6. 添加到画廊
+                // 5. 保存到画廊（使用 blob URL 预览）
                 const authorName = currentUser ? currentUser.username : '游客';
                 const artworkItem = {
                     id: uploadData.id,
                     fileId: fileId,
-                    imageUrl: imageUrl,
+                    imageUrl: URL.createObjectURL(file),  // 使用本地 blob URL
                     title: '水墨作品 #' + (artworkGallery.length + 1),
                     author: authorName,
                     userId: currentUser ? currentUser.username : null,
